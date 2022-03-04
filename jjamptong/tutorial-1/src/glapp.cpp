@@ -1,14 +1,8 @@
 /*!
-@file    glapp.cpp
-@author  pghali@digipen.edu
-@date    10/11/2016
-@co-author : Dong-A Choi, Sunwoo Lee
-
-This file implements functionality useful and necessary to build OpenGL
-applications including use of external APIs such as GLFW to create a
-window and start up an OpenGL context and to extract function pointers
-to OpenGL implementations.
-
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 *//*__________________________________________________________________________*/
 
 /*                                                                   includes
