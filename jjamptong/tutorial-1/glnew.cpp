@@ -30,30 +30,21 @@ const char* GLNew::fragShdrFile =
 "{\n"
 "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
 "}\n\0";;
-
-
 void GLNew::init()
 {
-    if (!glfwInit()) {
-        std::cerr << "GL initialization failed" << std::endl;
-        throw std::runtime_error("fail to init glfw");
-    }
+    glfwInit();
+    
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef __APPLE__
+#ifdef APPLE
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
 
     window = glfwCreateWindow(800, 600, "jjamptong", nullptr, nullptr);
-    if (window == NULL)
-    {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        throw std::runtime_error("window is null");
-    }
+    
     glfwMakeContextCurrent(window);
     glViewport(0, 0, 800, 600);
 
@@ -62,40 +53,20 @@ void GLNew::init()
     GLuint vertShdr = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertShdr, 1, &vertShdrFile, NULL);
     glCompileShader(vertShdr);
- 
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertShdr, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertShdr, 512, NULL, infoLog);
-        std::cout << "vertex compilation fail\n" << infoLog << std::endl;
-    }
- 
+
     unsigned int fragShdr = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragShdr, 1, &fragShdrFile, NULL);
     glCompileShader(fragShdr);
 
-    glGetShaderiv(fragShdr, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragShdr, 512, NULL, infoLog);
-        std::cout << "fragment compilation fail\n" << infoLog << std::endl;
-    }
-
-   shdrpgm = glCreateProgram();
+    shdrpgm = glCreateProgram();
     glAttachShader(shdrpgm, vertShdr);
     glAttachShader(shdrpgm, fragShdr);
     glLinkProgram(shdrpgm);
-
-    glGetProgramiv(shdrpgm, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shdrpgm, 512, NULL, infoLog);
-        std::cout << "linking is fail\n" << infoLog << std::endl;
-    }
+    
     glDeleteShader(vertShdr);
     glDeleteShader(fragShdr);
 }
+
 
 void GLNew::update()
 {
