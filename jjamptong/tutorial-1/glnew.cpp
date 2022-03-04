@@ -32,7 +32,7 @@ const char* GLNew::fragmentShaderSource =
 "void main()\n"
 "{\n"
 "   FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);\n"
-"}\n\0"; ;
+"}\n\0";;
 
 
 void GLNew::init()
