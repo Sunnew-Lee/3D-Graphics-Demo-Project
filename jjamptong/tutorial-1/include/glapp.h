@@ -21,7 +21,7 @@ and transformations (in later labs).
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
-#include <GL/glew.h> // for access to OpenGL API declarations 
+#include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 #include <glhelper.h>
 
@@ -32,21 +32,18 @@ struct GLApp {
   static void update(double delta_time);
   static void draw();
   static void cleanup();
-	
-  // encapsulates state required to render a geometrical model
+
   struct GLModel {
-	  GLenum primitive_type{0}; // which OpenGL primitive to be rendered?
-	  GLSLShader shdr_pgm; // which shader program?
-	  GLuint vaoid{0}; // handle to VAO
-	  GLuint idx_elem_cnt{0}; // how many elements of primitive of type
-	  // primitive_type are to be rendered
-	  // member functions defined in glapp.cpp
+	  GLenum primitive_type{0};
+	  GLSLShader shdr_pgm; 
+	  GLuint vaoid{0}; 
+	  GLuint idx_elem_cnt{0}; 
+	  
 	  void setup_vao();
 	  void setup_shdrpgm();
 	  void draw();
   };
-  // data member to represent geometric model to be rendered
-  // C++ requires this object to have a definition in glapp.cpp!!!
+  
   static GLModel mdl;
 
 };

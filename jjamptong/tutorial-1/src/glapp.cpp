@@ -2,7 +2,7 @@
 @file    glapp.cpp
 @author  pghali@digipen.edu
 @date    10/11/2016
-@co-author : Dong-A Choi
+@co-author : Dong-A Choi, Sunwoo Lee
 
 This file implements functionality useful and necessary to build OpenGL
 applications including use of external APIs such as GLFW to create a
@@ -24,19 +24,13 @@ static GLApp    g_glapp;
 GLApp::GLModel GLApp::mdl;
 
 void GLApp::init() {
-	// Part 1: clear colorbuffer with RGBA value in glClearColor 
 	glClearColor(1.f, 0.f, 0.f, 1.f);
-	
-	// Part 2: use the entire window as viewport 
+
 	GLint w = GLHelper::width, h = GLHelper::height;
 	glViewport(0,0,w,h);
 
-	
-	// Part 3: initialize VAO and create shader program
 	mdl.setup_vao();
 	mdl.setup_shdrpgm();
-	
-	// Part 4: This is related to Task 1 where OpenGL context
 
 	glViewport(0, 0, GLHelper::width, GLHelper::height);
 
@@ -100,13 +94,6 @@ void GLApp::cleanup() {
 
 void GLApp::GLModel::setup_vao()
 {
-	// We'll define a rectangle in normalized device coordinates (NDC)
-// coordinates that has one-fourth the area of the window.
-// The NDC coordinates for a window range from [-1, 1] along both
-// both the X- and Y-axes. Therefore, the rectangle's (x, y) position
-// coordinates are in range [-0.5, 0.5]
-// We're using NDC coordinates, because we don't want to specify
-// a "model-to-world-to-view-to-clip" transform to the vertex shader.
 	std::array<glm::vec2, 3> pos_vtx{
 	glm::vec2(-0.5f, -0.5f), glm::vec2(0.5f, -0.5f),
 	glm::vec2(0.f, 0.5f)
@@ -130,15 +117,11 @@ void GLApp::GLModel::setup_vao()
 	std::cout << "Maximum vertex attributes: " << max_vtx_attribs << '\n';
 
 	glCreateVertexArrays(1, &vaoid); 
-	// for vertex position array, we use vertex attribute index 8
-	// and vertex buffer binding point 3
 	glEnableVertexArrayAttrib(vaoid, 8);
 	glVertexArrayVertexBuffer(vaoid, 3, vbo_hdl, 0, sizeof(glm::vec2));
 	glVertexArrayAttribFormat(vaoid, 8, 2, GL_FLOAT, GL_FALSE, 0);
 	glVertexArrayAttribBinding(vaoid, 8, 3);
 
-	// for vertex color array, we use vertex attribute index 9
-	// and vertex buffer binding point 4
 	glEnableVertexArrayAttrib(vaoid, 9);
 	glVertexArrayVertexBuffer(vaoid, 4, vbo_hdl, sizeof(glm::vec2) * pos_vtx.size(), sizeof(glm::vec3));
 	glVertexArrayAttribFormat(vaoid, 9, 3, GL_FLOAT, GL_FALSE, 0);
@@ -169,19 +152,12 @@ void GLApp::GLModel::setup_shdrpgm() {
 }
 
 void GLApp::GLModel::draw() {
-	// there are many shader programs initialized - here we're saying
-	// which specific shader program should be used to render geometry
 	shdr_pgm.Use();
-	// there are many models, each with their own initialized VAO object
-	// here, we're saying which VAO's state should be used to set up pipe
+
 	glBindVertexArray(vaoid);
-	// here, we're saying what primitive is to be rendered and how many
-	// such primitives exist.
-	// the graphics driver knows where to get the indices because the VAO
-	// containing this state information has been made current ...
+	
 	glDrawElements(primitive_type, idx_elem_cnt, GL_UNSIGNED_SHORT, NULL);
-	// after completing the rendering, we tell the driver that VAO
-	// vaoid and current shader program are no longer current
+	
 	glBindVertexArray(0);
 	shdr_pgm.UnUse();
 }
