@@ -106,7 +106,7 @@ Get handle to OpenGL context through GLHelper::GLFWwindow*.
 */
 static void init() {
   // Part 1
-  if (!GLHelper::init(1200, 675, "Tutorial 1")) {
+  if (!GLHelper::init(1200, 675, "CS250 Project")) {
     std::cout << "Unable to create OpenGL context" << std::endl;
     std::exit(EXIT_FAILURE);
   }

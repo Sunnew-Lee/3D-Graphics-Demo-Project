@@ -1,4 +1,9 @@
-#version 450 core
+#version 330
+
+//Dong-A Choi & Sunwoo Lee
+//CS250 Class Project
+//CS250
+//2022 spring
 
 in vec3 vInterpColor;
 

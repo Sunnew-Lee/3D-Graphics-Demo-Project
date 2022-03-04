@@ -158,8 +158,8 @@ void GLApp::GLModel::setup_vao()
 
 void GLApp::GLModel::setup_shdrpgm() {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
-	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/my-tutorial-1.vert"));
-	shdr_files.push_back(std::make_pair( GL_FRAGMENT_SHADER, "../shaders/my-tutorial-1.frag"));
+	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
+	shdr_files.push_back(std::make_pair( GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
 	shdr_pgm.CompileLinkValidate(shdr_files);
 	if (GL_FALSE == shdr_pgm.IsLinked()) {
 		std::cout << "Unable to compile/link/validate shader programs" << "\n";
