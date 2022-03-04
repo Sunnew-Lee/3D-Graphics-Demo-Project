@@ -10,7 +10,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glapp.h>
+
 
 struct GLNew {
 	GLNew();
@@ -20,10 +20,10 @@ struct GLNew {
 	static void cleanup();
 
 
-	static const char* vertexShaderSource;
-	static const char* fragmentShaderSource;
+	static const char* vertShdrFile;
+	static const char* fragShdrFile;
 
-	static unsigned int shaderProgram;
+	static unsigned int shdrpgm;
 
 	static GLFWwindow* window;
 	static unsigned int VBO, VAO;

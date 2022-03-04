@@ -6,27 +6,24 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glapp.h>
+#include <glm/glm.hpp>
 #include <array>
 
 #include <iostream>
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
 
 unsigned int GLNew::VAO;
 unsigned int GLNew::VBO;
 
 GLFWwindow* GLNew::window;
-unsigned int GLNew::shaderProgram;
-const char* GLNew::vertexShaderSource = 
+unsigned int GLNew::shdrpgm;
+const char* GLNew::vertShdrFile = 
 "#version 330 core\n"
 "layout (location = 0) in vec3 Position;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(vec3(Position.xyz), 1.0);\n"
 "}\0";;
-const char* GLNew::fragmentShaderSource = 
+const char* GLNew::fragShdrFile = 
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
@@ -58,46 +55,46 @@ void GLNew::init()
         throw std::runtime_error("window is null");
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glViewport(0, 0, 800, 600);
 
     glewInit();
 
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
+    GLuint vertShdr = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShdr, 1, &vertShdrFile, NULL);
+    glCompileShader(vertShdr);
  
     int success;
     char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(vertShdr, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(vertShdr, 512, NULL, infoLog);
         std::cout << "vertex compilation fail\n" << infoLog << std::endl;
     }
  
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
+    unsigned int fragShdr = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShdr, 1, &fragShdrFile, NULL);
+    glCompileShader(fragShdr);
 
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(fragShdr, GL_COMPILE_STATUS, &success);
     if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragShdr, 512, NULL, infoLog);
         std::cout << "fragment compilation fail\n" << infoLog << std::endl;
     }
 
-   shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+   shdrpgm = glCreateProgram();
+    glAttachShader(shdrpgm, vertShdr);
+    glAttachShader(shdrpgm, fragShdr);
+    glLinkProgram(shdrpgm);
 
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(shdrpgm, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(shdrpgm, 512, NULL, infoLog);
         std::cout << "linking is fail\n" << infoLog << std::endl;
     }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader(vertShdr);
+    glDeleteShader(fragShdr);
 }
 
 void GLNew::update()
@@ -127,12 +124,10 @@ void GLNew::draw()
 {
     while (!glfwWindowShouldClose(window))
     {
-        processInput(window);
-
         glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        glUseProgram(shdrpgm);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -146,20 +141,8 @@ void GLNew::cleanup()
 {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(shdrpgm);
 
     glfwTerminate();
 }
 
-
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
