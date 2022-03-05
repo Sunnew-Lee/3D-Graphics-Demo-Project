@@ -80,11 +80,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="glnew.h" />
+    <ClInclude Include="include\glapp.h" />
+    <ClInclude Include="include\glhelper.h" />
+    <ClInclude Include="include\glslshader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="glnew.cpp" />
+    <ClCompile Include="src\glapp.cpp" />
+    <ClCompile Include="src\glhelper.cpp" />
+    <ClCompile Include="src\glslshader.cpp" />
+    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
