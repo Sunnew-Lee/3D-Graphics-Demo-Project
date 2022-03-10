@@ -85,7 +85,7 @@ void GLApp::init() {
 }
 
 void GLApp::update(double delta_time) {
-	glClearColor(0.f,0.f, 0.f, 1.f);
+	//glClearColor(0.f,0.f, 0.f, 1.f);
 	
 }
 
