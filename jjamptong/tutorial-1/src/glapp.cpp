@@ -80,6 +80,8 @@ void GLApp::init() {
 	GLint max_view[2];
 	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &max_view[0]);
 	std::cout << "Maximum Viewport Dimensions: " << *max_view << " x " << *max_view << std::endl;
+
+	
 }
 
 void GLApp::update(double delta_time) {

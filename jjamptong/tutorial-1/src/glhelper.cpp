@@ -89,6 +89,8 @@ bool GLHelper::init(GLint w, GLint h, std::string t) {
   // this is the default setting ...
   glfwSetInputMode(GLHelper::ptr_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+  glfwSwapInterval(1);
+
   // Part 2: Initialize entry points to OpenGL functions and extensions
   GLenum err = glewInit();
   if (GLEW_OK != err) {

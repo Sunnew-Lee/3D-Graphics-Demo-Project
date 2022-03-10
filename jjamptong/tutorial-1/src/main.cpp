@@ -91,7 +91,7 @@ For now, there's nothing to draw - just paint color buffer with constant color
 */
 static void draw() {
   GLApp::draw();
-
+  
   glfwSwapBuffers(GLHelper::ptr_window);
 }
 
