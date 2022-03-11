@@ -24,6 +24,12 @@
     <ClInclude Include="include\glslshader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="glNew.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glapp.cpp">
@@ -36,6 +42,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glNew.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

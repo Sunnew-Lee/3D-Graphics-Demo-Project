@@ -1,39 +1,18 @@
-/*!
-@file    glapp.cpp
-@author  pghali@digipen.edu
-@date    10/11/2016
-@co-author : Dong-A Choi, Sunwoo Lee
-
-// Dong-A Choi, Sunwoo Lee
-// CS250 Class Project
-// CS250
-// 2022 spring
-
-This file implements functionality useful and necessary to build OpenGL
-applications including use of external APIs such as GLFW to create a
-window and start up an OpenGL context and to extract function pointers
-to OpenGL implementations.
-
-*//*__________________________________________________________________________*/
-
-/*                                                                   includes
------------------------------------------------------------------------------ */
-#include <glapp.h>
+#include "glNew.h"
 #include <glhelper.h>
 #include <glslshader.h>
 #include <array>
-#include <../IG.h>
 
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
-static GLApp    g_glapp;
-GLApp::GLModel GLApp::mdl;
+static GLNew    g_glnew;
+GLNew::GLModel GLNew::mdl;
 
-void GLApp::init() {
+void GLNew::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
 	GLint w = GLHelper::width, h = GLHelper::height;
-	glViewport(0,0,w,h);
+	glViewport(0, 0, w, h);
 
 	mdl.setup_vao();
 	mdl.setup_shdrpgm();
@@ -48,35 +27,34 @@ void GLApp::init() {
 	std::cout << "GL Version: " << str_ver << std::endl;
 
 	GLubyte const* sha_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
-    std::cout << "GL Shader Version: " << sha_ver << std::endl;
-	
+	std::cout << "GL Shader Version: " << sha_ver << std::endl;
+
 }
 
-void GLApp::update(double delta_time) {
+void GLNew::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	IG::update();
+
 }
 
-void GLApp::draw() {  
+void GLNew::draw() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mdl.draw();
-	IG::draw();
 }
 
-void GLApp::cleanup() {
-  // empty for now
+void GLNew::cleanup() {
+	// empty for now
 }
 
-void GLApp::GLModel::setup_vao()
+void GLNew::GLModel::setup_vao()
 {
 	std::array<glm::vec2, 3> pos_vtx{
 	glm::vec2(-0.5f, -0.5f), glm::vec2(0.5f, -0.5f),
 	glm::vec2(0.f, 0.5f)
 	};
 	std::array<glm::vec3, 3> clr_vtx{
-	glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),
-	glm::vec3(0.f, 0.f, 1.f)
+	glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f),
+	glm::vec3(1.f, 1.f, 1.f)
 	};
 
 	GLuint vbo_hdl;
@@ -92,7 +70,7 @@ void GLApp::GLModel::setup_vao()
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_vtx_attribs);
 	std::cout << "Maximum vertex attributes: " << max_vtx_attribs << '\n';
 
-	glCreateVertexArrays(1, &vaoid); 
+	glCreateVertexArrays(1, &vaoid);
 	glEnableVertexArrayAttrib(vaoid, 8);
 	glVertexArrayVertexBuffer(vaoid, 3, vbo_hdl, 0, sizeof(glm::vec2));
 	glVertexArrayAttribFormat(vaoid, 8, 2, GL_FLOAT, GL_FALSE, 0);
@@ -115,10 +93,10 @@ void GLApp::GLModel::setup_vao()
 
 }
 
-void GLApp::GLModel::setup_shdrpgm() {
+void GLNew::GLModel::setup_shdrpgm() {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
 	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
-	shdr_files.push_back(std::make_pair( GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
+	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
 	shdr_pgm.CompileLinkValidate(shdr_files);
 	if (GL_FALSE == shdr_pgm.IsLinked()) {
 		std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -127,13 +105,17 @@ void GLApp::GLModel::setup_shdrpgm() {
 	}
 }
 
-void GLApp::GLModel::draw() {
+void GLNew::GLModel::draw() {
 	shdr_pgm.Use();
 
 	glBindVertexArray(vaoid);
-	
+
 	glDrawElements(primitive_type, idx_elem_cnt, GL_UNSIGNED_SHORT, NULL);
-	
+
 	glBindVertexArray(0);
 	shdr_pgm.UnUse();
 }
+
+
+
+

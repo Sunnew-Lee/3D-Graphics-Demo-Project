@@ -40,17 +40,15 @@ struct GLApp {
 
   struct GLModel {
 	  GLenum primitive_type{0};
-	  GLSLShader shdr_pgm; 
-	  GLuint vaoid{0}; 
+	  GLSLShader shdr_pgm;
+	  GLuint vaoid{0};
 	  GLuint idx_elem_cnt{0}; 
 	  
 	  void setup_vao();
 	  void setup_shdrpgm();
 	  void draw();
   };
-  
   static GLModel mdl;
-
 };
 
 #endif /* GLAPP_H */
