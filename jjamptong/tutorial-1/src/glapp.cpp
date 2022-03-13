@@ -26,7 +26,7 @@ to OpenGL implementations.
 
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
-static GLApp    g_glapp;
+//static GLApp    g_glapp;
 GLApp::GLModel GLApp::mdl;
 
 void GLApp::init() {
@@ -49,7 +49,8 @@ void GLApp::init() {
 
 	GLubyte const* sha_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
     std::cout << "GL Shader Version: " << sha_ver << std::endl;
-	
+
+	IG::init();
 }
 
 void GLApp::update(double delta_time) {
@@ -66,6 +67,7 @@ void GLApp::draw() {
 
 void GLApp::cleanup() {
   // empty for now
+	IG::cleanup();
 }
 
 void GLApp::GLModel::setup_vao()

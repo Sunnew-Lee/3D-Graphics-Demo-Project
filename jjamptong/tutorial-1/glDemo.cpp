@@ -1,14 +1,16 @@
-#include "glNew.h"
+#include "GLDemo.h"
 #include <glhelper.h>
 #include <glslshader.h>
 #include <array>
 
+#include "IG.h"
+
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
-static GLNew    g_glnew;
-GLNew::GLModel GLNew::mdl;
+//static GLNew    g_glnew;
+GLDemo::GLModel GLDemo::mdl;
 
-void GLNew::init() {
+void GLDemo::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
 	GLint w = GLHelper::width, h = GLHelper::height;
@@ -29,24 +31,27 @@ void GLNew::init() {
 	GLubyte const* sha_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
 	std::cout << "GL Shader Version: " << sha_ver << std::endl;
 
+	IG::init();
 }
 
-void GLNew::update(double delta_time) {
+void GLDemo::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-
+	IG::update();
 }
 
-void GLNew::draw() {
+void GLDemo::draw() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mdl.draw();
+	IG::draw();
 }
 
-void GLNew::cleanup() {
+void GLDemo::cleanup() {
 	// empty for now
+	IG::cleanup();
 }
 
-void GLNew::GLModel::setup_vao()
+void GLDemo::GLModel::setup_vao()
 {
 	std::array<glm::vec2, 3> pos_vtx{
 	glm::vec2(-0.5f, -0.5f), glm::vec2(0.5f, -0.5f),
@@ -93,7 +98,7 @@ void GLNew::GLModel::setup_vao()
 
 }
 
-void GLNew::GLModel::setup_shdrpgm() {
+void GLDemo::GLModel::setup_shdrpgm() {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
 	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
 	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
@@ -105,7 +110,7 @@ void GLNew::GLModel::setup_shdrpgm() {
 	}
 }
 
-void GLNew::GLModel::draw() {
+void GLDemo::GLModel::draw() {
 	shdr_pgm.Use();
 
 	glBindVertexArray(vaoid);

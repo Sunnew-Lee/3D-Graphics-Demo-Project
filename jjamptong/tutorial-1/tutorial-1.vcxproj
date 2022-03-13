@@ -80,14 +80,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="glNew.h" />
+    <ClInclude Include="Base.h" />
+    <ClInclude Include="DemoManager.h" />
+    <ClInclude Include="glDemo.h" />
     <ClInclude Include="IG.h" />
     <ClInclude Include="include\glapp.h" />
     <ClInclude Include="include\glhelper.h" />
     <ClInclude Include="include\glslshader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glNew.cpp" />
+    <ClCompile Include="DemoManager.cpp" />
+    <ClCompile Include="glDemo.cpp" />
     <ClCompile Include="IG.cpp" />
     <ClCompile Include="src\glapp.cpp" />
     <ClCompile Include="src\glhelper.cpp" />

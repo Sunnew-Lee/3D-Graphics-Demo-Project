@@ -24,7 +24,7 @@ an OpenGL context and implement a game loop.
 #include <sstream>
 #include <iomanip>
 #include <../IG.h>
-#include <../glNew.h>
+#include <../glDemo.h>
 
 /*                                                   type declarations
 ----------------------------------------------------------------------------- */
@@ -58,10 +58,8 @@ static void init() {
         std::exit(EXIT_FAILURE);
     }
 
-    IG::init();
-
-    GLApp::init();
-   // GLNew::init();
+	GLApp::init();
+    //GLDemo::init();
 }
 
 static void update() {
@@ -73,24 +71,22 @@ static void update() {
   std::stringstream sstr;
   sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
   glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
-
+ 
   GLApp::update(delta_time);
-  //GLNew::update(delta_time);
+  //GLDemo::update(delta_time);
 }
 
 static void draw() {
     ImGui::Render();
-
+    
   GLApp::draw();
- // GLNew::draw();
+  //GLDemo::draw();
 
   glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
-
-	IG::cleanup();
   GLHelper::cleanup();
   GLApp::cleanup();
-  //GLNew::cleanup();
+  //GLDemo::cleanup();
 }

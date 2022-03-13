@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GLNEW_H
-#define GLNEW_H
+#ifndef GLDEMO_H
+#define GLDEMO_H
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
@@ -11,7 +11,7 @@
 
 #include "glslshader.h"
 
-struct GLNew {
+struct GLDemo {
 	static void init();
 	static void update(double delta_time);
 	static void draw();
