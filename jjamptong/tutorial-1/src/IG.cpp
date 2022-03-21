@@ -1,6 +1,6 @@
-#include "IG.h"
+#include <IG.h>
 
-#include "glhelper.h"
+#include <glhelper.h>
 
 
 bool show_demo_window = false;

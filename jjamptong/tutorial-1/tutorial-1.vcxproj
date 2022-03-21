@@ -82,20 +82,29 @@
   <ItemGroup>
     <ClInclude Include="Base.h" />
     <ClInclude Include="DemoManager.h" />
-    <ClInclude Include="glDemo.h" />
-    <ClInclude Include="IG.h" />
     <ClInclude Include="include\glapp.h" />
+    <ClInclude Include="include\glDemo.h" />
     <ClInclude Include="include\glhelper.h" />
     <ClInclude Include="include\glslshader.h" />
+    <ClInclude Include="include\graphics.hpp" />
+    <ClInclude Include="include\IG.h" />
+    <ClInclude Include="include\math.hpp" />
+    <ClInclude Include="include\mesh.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\object.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DemoManager.cpp" />
-    <ClCompile Include="glDemo.cpp" />
-    <ClCompile Include="IG.cpp" />
     <ClCompile Include="src\glapp.cpp" />
+    <ClCompile Include="src\glDemo.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\glslshader.cpp" />
+    <ClCompile Include="src\graphics.cpp" />
+    <ClCompile Include="src\IG.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

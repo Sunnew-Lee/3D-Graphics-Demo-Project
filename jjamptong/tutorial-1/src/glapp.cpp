@@ -22,7 +22,7 @@ to OpenGL implementations.
 #include <glhelper.h>
 #include <glslshader.h>
 #include <array>
-#include <../IG.h>
+#include <IG.h>
 
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
