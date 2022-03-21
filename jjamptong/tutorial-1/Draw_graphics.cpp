@@ -1,65 +1,54 @@
-#include "GLDemo.h"
+#include <../Draw_graphics.h>
 #include <glhelper.h>
 #include <glslshader.h>
 #include <array>
+#include <../IG.h>
+#include <glm/gtc/type_ptr.hpp>
 
-#include "IG.h"
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
+Draw_graphics::GLModel Draw_graphics::mdl;
 
-/*                                                   objects with file scope
------------------------------------------------------------------------------ */
-//static GLNew    g_glnew;
-GLDemo::GLModel GLDemo::mdl;
-
-void GLDemo::init() {
+void Draw_graphics::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
 	GLint w = GLHelper::width, h = GLHelper::height;
 	glViewport(0, 0, w, h);
 
-	mdl.setup_vao();
 	mdl.setup_shdrpgm();
-
-	GLubyte const* str_ven = glGetString(GL_VENDOR);
-	std::cout << "GPU Vendor: " << str_ven << std::endl;
-
-	GLubyte const* str_ren = glGetString(GL_RENDERER);
-	std::cout << "GL Renderer: " << str_ren << std::endl;
-
-	GLubyte const* str_ver = glGetString(GL_VERSION);
-	std::cout << "GL Version: " << str_ver << std::endl;
-
-	GLubyte const* sha_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	std::cout << "GL Shader Version: " << sha_ver << std::endl;
+	mdl.setup_vao();
 
 	IG::init();
 }
 
-void GLDemo::update(double delta_time) {
+void Draw_graphics::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
 	IG::update();
 }
 
-void GLDemo::draw() {
+void Draw_graphics::draw() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	mdl.draw();
 	IG::draw();
 }
 
-void GLDemo::cleanup() {
+void Draw_graphics::cleanup() {
 	// empty for now
 	IG::cleanup();
 }
 
-void GLDemo::GLModel::setup_vao()
+void Draw_graphics::GLModel::setup_vao()
 {
-	std::array<glm::vec2, 3> pos_vtx{
-	glm::vec2(-0.5f, -0.5f), glm::vec2(0.5f, -0.5f),
-	glm::vec2(0.f, 0.5f)
+	/*std::array<glm::vec3, 8> pos_vtx{
+	glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f,-0.5f,-0.5f),
+	glm::vec3(0.f, 0.5f)
 	};
 	std::array<glm::vec3, 3> clr_vtx{
-	glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f),
-	glm::vec3(1.f, 1.f, 1.f)
+	glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),
+	glm::vec3(0.f, 0.f, 1.f)
 	};
 
 	GLuint vbo_hdl;
@@ -94,14 +83,41 @@ void GLDemo::GLModel::setup_vao()
 	glNamedBufferStorage(ebo_hdl, sizeof(GLushort) * idx_elem_cnt,
 		reinterpret_cast<GLvoid*>(idx_vtx.data()), GL_DYNAMIC_STORAGE_BIT);
 	glVertexArrayElementBuffer(vaoid, ebo_hdl);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 
+	MVpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
+	colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
+
+	glGenVertexArrays(1, &mesh[0].VAO);
+	glBindVertexArray(mesh[0].VAO);
+
+	glGenBuffers(1, &mesh[0].VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh[0].VBO);
+	/*  Copy vertex attributes to GPU */
+	glBufferData(GL_ARRAY_BUFFER,
+		mesh[0].numVertices * vertexSize, &mesh[0].vertexBuffer[0],
+		GL_STATIC_DRAW);
+
+	glGenBuffers(1, &mesh[0].IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh[0].IBO);
+	/*  Copy vertex indices to GPU */
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		mesh[0].numIndices * indexSize, &mesh[0].indexBuffer[0],
+		GL_STATIC_DRAW);
+
+	/*  Send vertex attributes to shaders */
+	for (int i = 0; i < numAttribs; ++i)
+	{
+		glEnableVertexAttribArray(vLayout[i].location);
+		glVertexAttribPointer(vLayout[i].location, vLayout[i].size, vLayout[i].type,
+			vLayout[i].normalized, vertexSize, (void*)vLayout[i].offset);
+	}
 }
 
-void GLDemo::GLModel::setup_shdrpgm() {
+void Draw_graphics::GLModel::setup_shdrpgm() {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
-	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
-	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
+	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/Draw_graphics.vert"));
+	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/Draw_graphics.frag"));
 	shdr_pgm.CompileLinkValidate(shdr_files);
 	if (GL_FALSE == shdr_pgm.IsLinked()) {
 		std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -110,7 +126,7 @@ void GLDemo::GLModel::setup_shdrpgm() {
 	}
 }
 
-void GLDemo::GLModel::draw() {
+void Draw_graphics::GLModel::draw() {
 	shdr_pgm.Use();
 
 	glBindVertexArray(vaoid);
@@ -120,7 +136,3 @@ void GLDemo::GLModel::draw() {
 	glBindVertexArray(0);
 	shdr_pgm.UnUse();
 }
-
-
-
-

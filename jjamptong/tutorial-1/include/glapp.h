@@ -29,7 +29,7 @@ and transformations (in later labs).
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 #include <glhelper.h>
-#include "../Base.h"
+
 
 #include "glslshader.h"
 

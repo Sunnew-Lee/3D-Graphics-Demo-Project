@@ -1,17 +1,20 @@
 #pragma once
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
+#ifndef DRAW_GRAPHICS_H
+#define DRAW_GRAPHICS_H
 
-#ifndef GLDEMO_H
-#define GLDEMO_H
-
-/*                                                                   includes
------------------------------------------------------------------------------ */
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
-#include <glhelper.h>
 
 #include "glslshader.h"
+#include "graphics.h"
+#include "Mesh.h"
+#include "../object.h"
 
-struct GLDemo {
+struct Draw_graphics {
 	static void init();
 	static void update(double delta_time);
 	static void draw();
@@ -26,8 +29,13 @@ struct GLDemo {
 		void setup_vao();
 		void setup_shdrpgm();
 		void draw();
+
+		GLuint MVpMatLoc, colorLoc;
+
 	};
 	static GLModel mdl;
+
+	
 };
 
-#endif /* GLAPP_H */
+#endif
