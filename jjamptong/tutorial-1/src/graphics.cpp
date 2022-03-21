@@ -55,7 +55,7 @@ float rotAngle;
 Mat4 rotationMat;               /*  get computed every frame independent so no need to keep track */
 Mat4 transformMat[NUM_PARTS];   /*  hierarchical transform, child is affected by parent */
 
-Mat4 baseMVPMat, partMVPMat[NUM_PARTS];
+Mat4 baseMVPMat, wallMVPMat, partMVPMat[NUM_PARTS];
 
 /*  Matrices for view/projetion transformations */
 Mat4 viewMat, projMat, vpMat;
@@ -221,6 +221,7 @@ void ComputeViewProjMats()
     {
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
+        wallMVPMat = vpMat * wall.selfMat;
     }
 }
 
@@ -491,7 +492,7 @@ void Render()
     ComputeViewProjMats();
 
     /*  Send the floor data to shaders for rendering */
-    UpdateUniforms_Draw(wall, baseMVPMat);
+    UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
 
     for (int i = 0; i < NUM_PARTS; ++i)
