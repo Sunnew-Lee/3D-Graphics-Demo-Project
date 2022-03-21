@@ -58,8 +58,8 @@ static void init() {
         std::exit(EXIT_FAILURE);
     }
 
-	GLApp::init();
-    //GLDemo::init();
+	//GLApp::init();
+    GLDemo::init();
 }
 
 static void update() {
@@ -72,21 +72,21 @@ static void update() {
   sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
   glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
  
-  GLApp::update(delta_time);
-  //GLDemo::update(delta_time);
+  //GLApp::update(delta_time);
+  GLDemo::update(delta_time);
 }
 
 static void draw() {
     ImGui::Render();
     
-  GLApp::draw();
-  //GLDemo::draw();
+  //GLApp::draw();
+  GLDemo::draw();
 
   glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
+  //GLApp::cleanup();
+  GLDemo::cleanup();
   GLHelper::cleanup();
-  GLApp::cleanup();
-  //GLDemo::cleanup();
 }
