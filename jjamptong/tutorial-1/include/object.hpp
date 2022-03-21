@@ -94,7 +94,7 @@ const Object part[NUM_PARTS]
                     },
                     {   /*  LEFT ARM    */
                         CYLINDER,
-                        Vec4(0.6f, 0.6f, 1.0f, 1.0f),                           /*  Color */
+                        Vec4(1.0f, 0.0f, 0.0f, 1.0f),                           /*  Color */
                         Translate(0.0f, -2.0f, 0.0f) * Scale(0.7f, 4.0f, 0.7f), /*  Self-transform: translate off so that center of rotation is at shoulder */
                         Translate(1.6f, 1.8f, 0.0f),                            /*  Translation w.r.t. parent */
                         XAXIS,                                                  /*  Rotation w.r.t. parent */
@@ -122,12 +122,12 @@ const Object part[NUM_PARTS]
                     },
                     {   /*  LEFT LEG    */
                         CYLINDER,
-                        Vec4(0.19f, 0.22f, 0.26f, 1.0f),                        /*  Color */
+                        Vec4(1.0f, 0.0f, 0.0f, 1.0f),                        /*  Color */
                         Translate(0.0f, -2.5f, 0.0f) * Scale(1.2f, 5.0f, 1.2f), /*  Self-transform: translate off so that center of rotation is at hip */
                         Translate(-0.6f, -2.0f, 0.0f),                          /*  Translation w.r.t. parent */
                         XAXIS,                                                  /*  Rotation w.r.t. parent */
-                        EIGHTH_PI,
-                        JEANS                                                   /*  Texture image ID */
+                        EIGHTH_PI
+                        //JEANS                                                   /*  Texture image ID */
                     },
                     {   /*  RIGHT LEG    */
                         CYLINDER,
