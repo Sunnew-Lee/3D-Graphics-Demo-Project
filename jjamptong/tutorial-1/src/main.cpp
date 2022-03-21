@@ -77,7 +77,7 @@ static void update() {
 }
 
 static void draw() {
-    ImGui::Render();
+   ImGui::Render();
     
   //GLApp::draw();
   GLDemo::draw();
