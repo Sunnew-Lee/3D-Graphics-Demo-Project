@@ -77,8 +77,6 @@ const char *imgFileName[NUM_IMAGES]
 RenderMode currRenderMode = COLOR;
 
 /*  Shader filenames */
-const char vsFileName[] { "../shaders/shader.vs" };
-const char fsFileName[] { "../shaders/shader.fs" };
 
 
 /*  ID of the set of shaders that we'll use */
@@ -176,11 +174,11 @@ void ValidateProgram(GLuint program)
         Fragment shader filename.
 */
 /******************************************************************************/
-void CompileShaders(const char vsFilename[], const char fsFilename[])
+void CompileShaders()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vs"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.fs"));
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -331,7 +329,7 @@ void SetUp()
     animated = true;
 
     /*  Compile and link the shaders into rendering program */
-    CompileShaders(vsFileName, fsFileName);
+    CompileShaders();
     shdr_pgm.Use();
 
     /*  Obtain the locations of the variables in the shaders with the given names */

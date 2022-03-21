@@ -80,8 +80,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Base.h" />
-    <ClInclude Include="DemoManager.h" />
     <ClInclude Include="include\glapp.h" />
     <ClInclude Include="include\glDemo.h" />
     <ClInclude Include="include\glhelper.h" />
@@ -96,7 +94,6 @@
     <ClInclude Include="include\object.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DemoManager.cpp" />
     <ClCompile Include="src\glapp.cpp" />
     <ClCompile Include="src\glDemo.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
