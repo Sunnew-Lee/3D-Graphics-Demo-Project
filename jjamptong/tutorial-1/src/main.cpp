@@ -23,8 +23,8 @@ an OpenGL context and implement a game loop.
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <../IG.h>
-#include <../glDemo.h>
+#include <IG.h>
+#include <glDemo.h>
 
 /*                                                   type declarations
 ----------------------------------------------------------------------------- */

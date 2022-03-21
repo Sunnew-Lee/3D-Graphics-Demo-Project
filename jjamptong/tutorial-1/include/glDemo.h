@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <glhelper.h>
 
-#include "glslshader.h"
+#include <glslshader.h>
 
 struct GLDemo {
 	static void init();

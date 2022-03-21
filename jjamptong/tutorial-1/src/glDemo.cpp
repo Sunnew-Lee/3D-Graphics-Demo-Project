@@ -1,9 +1,9 @@
-#include "GLDemo.h"
+#include <GLDemo.h>
 #include <glhelper.h>
 #include <glslshader.h>
 #include <array>
 
-#include "IG.h"
+#include <IG.h>
 
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
@@ -58,8 +58,8 @@ void GLDemo::GLModel::setup_vao()
 	glm::vec2(0.f, 0.5f)
 	};
 	std::array<glm::vec3, 3> clr_vtx{
-	glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f),
-	glm::vec3(1.f, 1.f, 1.f)
+	glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),
+	glm::vec3(0.f, 0.f, 1.f)
 	};
 
 	GLuint vbo_hdl;
