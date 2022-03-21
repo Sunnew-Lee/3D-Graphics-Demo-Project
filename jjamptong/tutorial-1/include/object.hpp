@@ -63,6 +63,17 @@ const PartID parent[NUM_PARTS]
 enum ImageID { BRICKS, FACE, JEANS, BALOONS, NUM_IMAGES };
 
 
+const Object wall
+{
+    PLANE,
+    Vec4(Torus_color.x,Torus_color.y,Torus_color.z,Torus_color.w),                               /*  Color */
+    Translate(0.0f, 9.4f, -10.0f)* Rotate(PI, XAXIS)
+    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+    Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
+    YAXIS,                                                      /*  Rotation w.r.t. parent */
+    0.0f
+    /*  Texture image ID */
+};
 /*  The base on which the character is walking */
 const Object base   
                 {

@@ -50,7 +50,8 @@ Mesh CreatePlane(int stacks, int slices)
             Vertex v;
 
             v.pos = Vec3(col - 0.5f, 0.5f - row, 0.0f);
-            v.nrm = Vec3(0.0f, 0.0f, 1.0f);
+            v.nrm = Vec3(v.pos.x, v.pos.y, 1.0f);
+
             v.uv = Vec2(col, row);
 
             addVertex(mesh, v);

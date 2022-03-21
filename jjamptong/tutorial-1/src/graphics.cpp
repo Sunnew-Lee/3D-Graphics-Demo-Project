@@ -491,6 +491,7 @@ void Render()
     ComputeViewProjMats();
 
     /*  Send the floor data to shaders for rendering */
+    UpdateUniforms_Draw(wall, baseMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
 
     for (int i = 0; i < NUM_PARTS; ++i)

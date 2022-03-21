@@ -33,9 +33,6 @@ extern int height;
 
 
 
-/*  For toggling animation, need to access from input.cpp  */
-extern bool animated, justAnimated;
-
 /*  For moving camera about the origin.
     I'm using int values to avoid imprecision when updating camera position over
     a long period of time.
