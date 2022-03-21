@@ -20,9 +20,6 @@
 #include <glhelper.h>
 
 
-/******************************************************************************/
-/*  Graphics-related variables                                                */
-/******************************************************************************/
 /*  Viewport width & height */
 int width   = 1200;
 int height  = 675;
@@ -87,17 +84,7 @@ GLint textureLoc, colorLoc, mvpMatLoc;
 
 GLSLShader shdr_pgm;
 
-/******************************************************************************/
-/*!
-\fn     void ValidateShader(GLuint shader, const char *file)
-\brief
-        Check whether shader files can be compiled successfully.
-\param  shader
-        ID of the shader
-\param  file
-        Shader file name
-*/
-/******************************************************************************/
+
 void ValidateShader(GLuint shader, const char *file)
 {
     const unsigned int BUFFER_SIZE = 512;
@@ -119,15 +106,6 @@ void ValidateShader(GLuint shader, const char *file)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void ValidateProgram(GLuint program)
-\brief
-        Check whether shader program can be linked successfully.
-\param  program
-        ID of the shader program
-*/
-/******************************************************************************/
 void ValidateProgram(GLuint program)
 {
     const unsigned int BUFFER_SIZE = 512;
@@ -163,17 +141,7 @@ void ValidateProgram(GLuint program)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void CompileShaders(char vsFilename[], char fsFilename[])
-\brief
-        Read the shader files, compile and link them into a program for render.
-\param  const char vsFilename[]
-        Vertex shader filename.
-\param  const char fsFilename[]
-        Fragment shader filename.
-*/
-/******************************************************************************/
+
 void CompileShaders()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
@@ -359,16 +327,6 @@ void SetUp()
     shdr_pgm.UnUse();
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void UpdateTransform(int partID)
-\brief
-        Update transformation/MVP matrices for part[partID]
-\param  partID
-        ID of the part we want to update
-*/
-/******************************************************************************/
 void UpdateTransform(int partID, float delta_time)
 {
     if (animated)
@@ -415,52 +373,33 @@ void UpdateTransform(int partID, float delta_time)
     partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
-\brief
-        Update the color/texture, transformation matrix and vertex data of
-        each object to shaders for rendering.
-        Note that we do this per object, not per vertex.
-\param  obj
-        The object that we want to render.
-\param  MVPMat
-        The transformation matrix of the object. Object data is pre-defined as
-        constants, so we have to store transform data separately.
-*/
-/******************************************************************************/
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
-    if (currRenderMode == NORMAL)
-        glUniform4fv(colorLoc, 1, ValuePtr(useNormal)); 
+    if (currRenderMode == NORMAL) {
+        glUniform4fv(colorLoc, 1, ValuePtr(useNormal));
+        
+    }
         /*  Trigger shader to use normal for color */
     else
-    if (obj.imageID < 0 || currRenderMode == WIREFRAME)
-        glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); 
+        if (obj.imageID < 0 || currRenderMode == WIREFRAME) {
+            glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
+        }
         /*  Use obj's color if drawing wireframes or objs that don't have textures */
     else
     {
         glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
-        glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
+    	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
     }
-
     /*  Send MVP matrix to shaders */
     glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(MVPMat));
 
     /*  Tell shader to use obj's VAO for rendering */
+        
     glBindVertexArray(mesh[obj.meshID].VAO);
     glDrawElements(GL_TRIANGLES, mesh[obj.meshID].numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void CleanUp()
-\brief
-        Clean up the graphics-related stuffs before shutting down.
-*/
-/******************************************************************************/
 void CleanUp()
 {
     glBindVertexArray(0);
@@ -480,17 +419,6 @@ void CleanUp()
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void Resize(int w, int h)
-\brief
-        Update viewport and projection matrix upon window resize.
-\param  w
-        The new width of the window
-\param  h
-        The new height of the window
-*/
-/******************************************************************************/
 void Resize(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -515,19 +443,13 @@ void Resize(int w, int h)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void Render()
-\brief
-        Render function for update & drawing.
-*/
-/******************************************************************************/
 void Render(double delta_time)
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
     glClearBufferfv(GL_COLOR, 0, bgColor);
     glClearBufferfv(GL_DEPTH, 0, &one);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     if (animated)
     {
@@ -544,6 +466,7 @@ void Render(double delta_time)
 
     for (int i = 0; i < NUM_PARTS; ++i)
     {
+    
         if (animated || eyeMoved || resized)
             UpdateTransform(i, static_cast<float>(delta_time));
 
@@ -555,9 +478,5 @@ void Render(double delta_time)
     eyeMoved = false;
     resized = false;
 
-    /*  This is only needed for old computers that have only one framebuffer, or don't automatically
-        swap the buffers. Not really showing siginificant effect on new computers.
-    */
-    //glfwSwapBuffers(GLHelper::ptr_window);
     shdr_pgm.UnUse();
 }

@@ -2,6 +2,8 @@
 
 #include <glhelper.h>
 
+#include "object.hpp"
+
 
 bool show_demo_window = false;
 bool show_another_window = false;
@@ -45,6 +47,8 @@ void IG::update()
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
         ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
+        ImGui::ColorEdit3("Torus color", (float*)&Torus_color);
+
         ImGui::End();
     }
 
@@ -72,6 +76,7 @@ void IG::update()
 void IG::draw()
 {
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
