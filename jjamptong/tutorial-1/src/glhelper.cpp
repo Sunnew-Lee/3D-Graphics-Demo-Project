@@ -24,6 +24,10 @@ GLint GLHelper::height;
 GLdouble GLHelper::fps;
 std::string GLHelper::title;
 GLFWwindow* GLHelper::ptr_window;
+GLHelper::RenderMode GLHelper::currRenderMode = NORMAL;
+GLHelper::CameraMode GLHelper::currCameraMode = IDLE;
+GLboolean GLHelper::animated = GL_TRUE;
+GLboolean GLHelper::justAnimated = GL_FALSE;
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -169,6 +173,58 @@ void GLHelper::key_cb(GLFWwindow *pwin, int key, int scancode, int action, int m
   if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action) {
     glfwSetWindowShouldClose(pwin, GLFW_TRUE);
   }
+
+  else if (GLFW_KEY_TAB == key && GLFW_PRESS == action ) {
+      switch (currRenderMode)
+      {
+      case WIREFRAME:
+          /*  Switch to drawing using color/texture */
+          currRenderMode = NORMAL; // COLOR
+          /*  Draw filled triangles and enable back-face culling */
+          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+          glEnable(GL_CULL_FACE);
+          break;
+
+      case COLOR:
+          /*  Switch to drawing using normals */
+          currRenderMode = NORMAL;
+          /*  Draw filled triangles and enable back-face culling */
+          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+          glEnable(GL_CULL_FACE);
+          break;
+
+      case NORMAL:
+          /*  Switch to wireframe mode */
+          currRenderMode = WIREFRAME;
+          /*  Draw lines and disable back-face culling */
+          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+          glDisable(GL_CULL_FACE);
+          break;
+      }
+  }
+  else if (GLFW_KEY_SPACE == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+      animated = !animated;
+      if (animated)
+          justAnimated = GL_TRUE;
+  }
+  else if (GLFW_KEY_W == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = UP;
+  }
+  else if (GLFW_KEY_S == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = DOWN;
+  }
+  else if (GLFW_KEY_A == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = LEFT;
+  }
+  else if (GLFW_KEY_D == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = RIGHT;
+  }
+  else if (GLFW_KEY_UP == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = CLOSER;
+  }
+  else if (GLFW_KEY_DOWN == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+	  currCameraMode = FARTHER;
+  }
 }
 
 /*  _________________________________________________________________________*/
@@ -263,9 +319,19 @@ mouse scroll wheel, being vertical, provides offsets only along the Y-axis.
 */
 void GLHelper::mousescroll_cb(GLFWwindow *pwin, double xoffset, double yoffset) {
 #ifdef _DEBUG
-  std::cout << "Mouse scroll wheel offset: ("
-    << xoffset << ", " << yoffset << ")" << std::endl;
+  //std::cout << "Mouse scroll wheel offset: ("
+    //<< xoffset << ", " << yoffset << ")" << std::endl;
 #endif
+
+  switch (static_cast<int>(yoffset))
+  {
+  case 1:
+      currCameraMode=FARTHER;
+      break;
+  case -1:
+      currCameraMode=CLOSER;
+      break;
+  }
 }
 
 /*  _________________________________________________________________________ */

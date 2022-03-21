@@ -86,6 +86,7 @@
     <ClInclude Include="include\glslshader.h" />
     <ClInclude Include="include\graphics.hpp" />
     <ClInclude Include="include\IG.h" />
+    <ClInclude Include="include\input.hpp" />
     <ClInclude Include="include\math.hpp" />
     <ClInclude Include="include\mesh.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -100,6 +101,7 @@
     <ClCompile Include="src\glslshader.cpp" />
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\IG.cpp" />
+    <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.cpp" />
   </ItemGroup>

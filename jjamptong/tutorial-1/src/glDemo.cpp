@@ -27,8 +27,8 @@ void GLDemo::init() {
 
 void GLDemo::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	Render(delta_time);
-	
+	Render();
+
 	IG::update();
 }
 
