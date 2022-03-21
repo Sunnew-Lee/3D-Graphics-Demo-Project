@@ -21,9 +21,6 @@
 #include <input.hpp>
 
 
-/******************************************************************************/
-/*  Graphics-related variables                                                */
-/******************************************************************************/
 /*  Viewport width & height */
 int width   = 1200;
 int height  = 675;
@@ -79,8 +76,6 @@ const char *imgFileName[NUM_IMAGES]
 
 
 /*  Shader filenames */
-const char vsFileName[] { "../shaders/shader.vs" };
-const char fsFileName[] { "../shaders/shader.fs" };
 
 
 /*  ID of the set of shaders that we'll use */
@@ -91,17 +86,7 @@ GLint textureLoc, colorLoc, mvpMatLoc;
 
 GLSLShader shdr_pgm;
 
-/******************************************************************************/
-/*!
-\fn     void ValidateShader(GLuint shader, const char *file)
-\brief
-        Check whether shader files can be compiled successfully.
-\param  shader
-        ID of the shader
-\param  file
-        Shader file name
-*/
-/******************************************************************************/
+
 void ValidateShader(GLuint shader, const char *file)
 {
     const unsigned int BUFFER_SIZE = 512;
@@ -123,15 +108,6 @@ void ValidateShader(GLuint shader, const char *file)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void ValidateProgram(GLuint program)
-\brief
-        Check whether shader program can be linked successfully.
-\param  program
-        ID of the shader program
-*/
-/******************************************************************************/
 void ValidateProgram(GLuint program)
 {
     const unsigned int BUFFER_SIZE = 512;
@@ -167,22 +143,12 @@ void ValidateProgram(GLuint program)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void CompileShaders(char vsFilename[], char fsFilename[])
-\brief
-        Read the shader files, compile and link them into a program for render.
-\param  const char vsFilename[]
-        Vertex shader filename.
-\param  const char fsFilename[]
-        Fragment shader filename.
-*/
-/******************************************************************************/
-void CompileShaders(const char vsFilename[], const char fsFilename[])
+
+void CompileShaders()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vs"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.fs"));
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -331,7 +297,7 @@ void SetUp()
 {
     /*  Starting time */
     /*  Compile and link the shaders into rendering program */
-    CompileShaders(vsFileName, fsFileName);
+    CompileShaders();
     shdr_pgm.Use();
 
     /*  Obtain the locations of the variables in the shaders with the given names */
@@ -360,7 +326,6 @@ void SetUp()
 
     shdr_pgm.UnUse();
 }
-
 
 /******************************************************************************/
 /*!
@@ -417,21 +382,6 @@ void UpdateTransform(int partID)
     partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
-\brief
-        Update the color/texture, transformation matrix and vertex data of
-        each object to shaders for rendering.
-        Note that we do this per object, not per vertex.
-\param  obj
-        The object that we want to render.
-\param  MVPMat
-        The transformation matrix of the object. Object data is pre-defined as
-        constants, so we have to store transform data separately.
-*/
-/******************************************************************************/
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
     if (GLHelper::currRenderMode == GLHelper::NORMAL)
@@ -444,25 +394,18 @@ void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
     else
     {
         glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
-        glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
+    	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
     }
-
     /*  Send MVP matrix to shaders */
     glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(MVPMat));
 
     /*  Tell shader to use obj's VAO for rendering */
+        
     glBindVertexArray(mesh[obj.meshID].VAO);
     glDrawElements(GL_TRIANGLES, mesh[obj.meshID].numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void CleanUp()
-\brief
-        Clean up the graphics-related stuffs before shutting down.
-*/
-/******************************************************************************/
 void CleanUp()
 {
     glBindVertexArray(0);
@@ -482,17 +425,6 @@ void CleanUp()
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void Resize(int w, int h)
-\brief
-        Update viewport and projection matrix upon window resize.
-\param  w
-        The new width of the window
-\param  h
-        The new height of the window
-*/
-/******************************************************************************/
 void Resize(int w, int h)
 {
     glViewport(0, 0, w, h);
@@ -530,6 +462,7 @@ void Render()
     shdr_pgm.Use();
     glClearBufferfv(GL_COLOR, 0, bgColor);
     glClearBufferfv(GL_DEPTH, 0, &one);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     if (GLHelper::animated)
     {
@@ -573,9 +506,5 @@ void Render()
     eyeMoved = false;
     resized = false;
 
-    /*  This is only needed for old computers that have only one framebuffer, or don't automatically
-        swap the buffers. Not really showing siginificant effect on new computers.
-    */
-    //glfwSwapBuffers(GLHelper::ptr_window);
     shdr_pgm.UnUse();
 }

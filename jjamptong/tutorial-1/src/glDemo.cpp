@@ -21,13 +21,14 @@ void GLDemo::init() {
 
 	GLubyte const* sha_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
 	std::cout << "GL Shader Version: " << sha_ver << std::endl;
-
+	
 	IG::init();
 }
 
 void GLDemo::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
 	Render();
+
 	IG::update();
 }
 
