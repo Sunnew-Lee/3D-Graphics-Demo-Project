@@ -63,6 +63,17 @@ const PartID parent[NUM_PARTS]
 enum ImageID { BRICKS, FACE, JEANS, BALOONS, NUM_IMAGES };
 
 
+const Object wall
+{
+    PLANE,
+    Vec4(Torus_color.x,Torus_color.y,Torus_color.z,Torus_color.w),                               /*  Color */
+    Translate(0.0f, 9.4f, -10.0f)* Rotate(PI, XAXIS)
+    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+    Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
+    YAXIS,                                                      /*  Rotation w.r.t. parent */
+    0.0f
+    /*  Texture image ID */
+};
 /*  The base on which the character is walking */
 const Object base   
                 {
@@ -107,7 +118,7 @@ const Object part[NUM_PARTS]
                     },
                     {   /*  LEFT ARM    */
                         CYLINDER,
-                        Vec4(0.6f, 0.6f, 1.0f, 1.0f),                           /*  Color */
+                        Vec4(1.0f, 0.0f, 0.0f, 1.0f),                           /*  Color */
                         Translate(0.0f, -2.0f, 0.0f) * Scale(0.7f, 4.0f, 0.7f), /*  Self-transform: translate off so that center of rotation is at shoulder */
                         Translate(1.6f, 1.8f, 0.0f),                            /*  Translation w.r.t. parent */
                         XAXIS,                                                  /*  Rotation w.r.t. parent */
@@ -135,7 +146,7 @@ const Object part[NUM_PARTS]
                     },
                     {   /*  LEFT LEG    */
                         CYLINDER,
-                        Vec4(0.19f, 0.22f, 0.26f, 1.0f),                        /*  Color */
+                        Vec4(1.0f, 0.0f, 0.0f, 1.0f),                        /*  Color */
                         Translate(0.0f, -2.5f, 0.0f) * Scale(1.2f, 5.0f, 1.2f), /*  Self-transform: translate off so that center of rotation is at hip */
                         Translate(-0.6f, -2.0f, 0.0f),                          /*  Translation w.r.t. parent */
                         XAXIS,                                                  /*  Rotation w.r.t. parent */

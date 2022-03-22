@@ -18,6 +18,7 @@
 #include <iostream>
 #include <glslshader.h>
 #include <glhelper.h>
+#include <input.hpp>
 
 
 /*  Viewport width & height */
@@ -43,15 +44,18 @@ bool resized    = true;     /*  to trigger projection matrix update */
 
 
 /*  For animating the objects */
-bool animated = true;
-bool justAnimated = false;  /*  To check if just switching from non-animated to animated */
+clock_t startTime;      /*  The starting time of the program */
+clock_t currTime;       /*  We'll use (currTime-startTime) to avoid accumulated imprecision */
+clock_t idleTime = 0;   /*  Amount of time animation is paused, so we can keep the animation smooth */
+clock_t tempTime;
+float secondsLapsed;        /*  Num of seconds from startTime to currTime */
 
 
 float rotAngle;
 Mat4 rotationMat;               /*  get computed every frame independent so no need to keep track */
 Mat4 transformMat[NUM_PARTS];   /*  hierarchical transform, child is affected by parent */
 
-Mat4 baseMVPMat, partMVPMat[NUM_PARTS];
+Mat4 baseMVPMat, wallMVPMat, partMVPMat[NUM_PARTS];
 
 /*  Matrices for view/projetion transformations */
 Mat4 viewMat, projMat, vpMat;
@@ -70,8 +74,6 @@ GLuint textures[NUM_IMAGES];
 const char *imgFileName[NUM_IMAGES] 
 { "images/bricks.png", "images/face.png", "images/jeans.png", "images/baloons.png" };
 
-/*  Rendering mode - COLOR or NORMAL or WIREFRAME */
-RenderMode currRenderMode = COLOR;
 
 /*  Shader filenames */
 
@@ -219,6 +221,7 @@ void ComputeViewProjMats()
     {
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
+        wallMVPMat = vpMat * wall.selfMat;
     }
 }
 
@@ -294,8 +297,6 @@ void ComputeViewProjMats()
 void SetUp()
 {
     /*  Starting time */
-    animated = true;
-
     /*  Compile and link the shaders into rendering program */
     CompileShaders();
     shdr_pgm.Use();
@@ -327,9 +328,18 @@ void SetUp()
     shdr_pgm.UnUse();
 }
 
-void UpdateTransform(int partID, float delta_time)
+/******************************************************************************/
+/*!
+\fn     void UpdateTransform(int partID)
+\brief
+        Update transformation/MVP matrices for part[partID]
+\param  partID
+        ID of the part we want to update
+*/
+/******************************************************************************/
+void UpdateTransform(int partID)
 {
-    if (animated)
+    if (GLHelper::animated)
     {
         /*  Perform rotation if needed */
         if (fabs(part[partID].rotAmount) > EPSILON)
@@ -339,7 +349,7 @@ void UpdateTransform(int partID, float delta_time)
                 /*  torso will rotate 360degs, but we keep the angle between 0 and 360.
                     For torso, rotAmount is rotation speed.
                 */
-                rotAngle = part[partID].rotAmount * delta_time;
+                rotAngle = part[partID].rotAmount * secondsLapsed;
                 while (rotAngle > TWO_PI)
                     rotAngle -= TWO_PI;
             }
@@ -348,8 +358,8 @@ void UpdateTransform(int partID, float delta_time)
                 /*  Other parts, if rotated, maintain the angle between [-rotAmount, rotAmount].
                     We simply use sine of [(secondLapsed MOD PI) * 4] to rotate in this range.
                 */
-                int isecs = static_cast<int>(delta_time / PI);
-                float phase = 4.0f * (delta_time - isecs * PI);
+                int isecs = static_cast<int>(secondsLapsed / PI);
+                float phase = 4.0f * (secondsLapsed - isecs * PI);
                 rotAngle = part[partID].rotAmount * std::sinf(phase);
             }
 
@@ -375,16 +385,13 @@ void UpdateTransform(int partID, float delta_time)
 
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
-    
-    if (currRenderMode == NORMAL) {
-        glUniform4fv(colorLoc, 1, ValuePtr(useNormal));
-        
-    }
+
+    if (GLHelper::currRenderMode == GLHelper::NORMAL)
+        glUniform4fv(colorLoc, 1, ValuePtr(useNormal)); 
         /*  Trigger shader to use normal for color */
     else
-        if (obj.imageID < 0 || currRenderMode == WIREFRAME) {
-            glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
-        }
+    if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
+        glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); 
         /*  Use obj's color if drawing wireframes or objs that don't have textures */
     else
     {
@@ -444,7 +451,14 @@ void Resize(int w, int h)
 }
 
 
-void Render(double delta_time)
+/******************************************************************************/
+/*!
+\fn     void Render()
+\brief
+        Render function for update & drawing.
+*/
+/******************************************************************************/
+void Render()
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
@@ -452,25 +466,41 @@ void Render(double delta_time)
     glClearBufferfv(GL_DEPTH, 0, &one);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    if (animated)
+    if (GLHelper::animated)
     {
-        if (justAnimated)
+        tempTime = clock();
+        if (GLHelper::justAnimated)
         {
-            justAnimated = false;
+            idleTime += tempTime - currTime;
+            GLHelper::justAnimated = GL_FALSE;
         }
+
+        currTime = tempTime;
+        /*  We subtract idleTime as well, to keep the animation smooth after the pause */
+        secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
+    }
+
+    switch (static_cast<int>(GLHelper::currCameraMode))
+    {
+    case GLHelper::UP: MoveUp(); GLHelper::currCameraMode = GLHelper::IDLE; break;
+    case GLHelper::DOWN:MoveDown(); GLHelper::currCameraMode = GLHelper::IDLE; break;
+    case GLHelper::LEFT:MoveLeft(); GLHelper::currCameraMode = GLHelper::IDLE; break;
+    case GLHelper::RIGHT:MoveRight(); GLHelper::currCameraMode = GLHelper::IDLE; break;
+    case GLHelper::CLOSER:MoveCloser(); GLHelper::currCameraMode = GLHelper::IDLE; break;
+    case GLHelper::FARTHER:MoveFarther(); GLHelper::currCameraMode = GLHelper::IDLE; break;
     }
 
     ComputeViewProjMats();
 
     /*  Send the floor data to shaders for rendering */
+    UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
     for (int i = 0; i < NUM_PARTS; ++i)
     {
-    
-        if (animated || eyeMoved || resized)
-            UpdateTransform(i, static_cast<float>(delta_time));
+        if (GLHelper::animated || eyeMoved || resized)
+            UpdateTransform(i);
 
         /*  Send each part's data to shaders for rendering */
         UpdateUniforms_Draw(part[i], partMVPMat[i]);

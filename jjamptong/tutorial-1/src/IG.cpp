@@ -7,7 +7,7 @@
 
 bool show_demo_window = false;
 bool show_another_window = false;
-ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+ImVec4 clear_color = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
 
 void IG::init()
 {

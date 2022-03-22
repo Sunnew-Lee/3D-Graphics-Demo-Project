@@ -31,12 +31,7 @@
 extern int width;
 extern int height;
 
-/*  For toggling between different rendering modes, need access from input.cpp */
-enum RenderMode { COLOR, NORMAL, WIREFRAME };
-extern RenderMode currRenderMode;
 
-/*  For toggling animation, need to access from input.cpp  */
-extern bool animated, justAnimated;
 
 /*  For moving camera about the origin.
     I'm using int values to avoid imprecision when updating camera position over
@@ -61,6 +56,6 @@ const int EYE_RADIUS_STEP   = 1;
 void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
-void Render(double delta_time);
+void Render();
 
 #endif
