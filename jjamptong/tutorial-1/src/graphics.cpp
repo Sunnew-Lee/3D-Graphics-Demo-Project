@@ -375,6 +375,7 @@ void UpdateTransform(int partID, float delta_time)
 
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
+    
     if (currRenderMode == NORMAL) {
         glUniform4fv(colorLoc, 1, ValuePtr(useNormal));
         
@@ -463,6 +464,7 @@ void Render(double delta_time)
 
     /*  Send the floor data to shaders for rendering */
     UpdateUniforms_Draw(base, baseMVPMat);
+    
 
     for (int i = 0; i < NUM_PARTS; ++i)
     {
