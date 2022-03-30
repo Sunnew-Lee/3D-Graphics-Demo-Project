@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tutorial-1", "tutorial-1\tutorial-1.vcxproj", "{CEF654BA-2066-42CD-91BB-9F1AD00B9487}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ToonAndFog", "ToonAndFog\ToonAndFog.vcxproj", "{4D015101-111B-4C37-91D7-D87973A70EE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{CEF654BA-2066-42CD-91BB-9F1AD00B9487}.Debug|x64.Build.0 = Debug|x64
 		{CEF654BA-2066-42CD-91BB-9F1AD00B9487}.Release|x64.ActiveCfg = Release|x64
 		{CEF654BA-2066-42CD-91BB-9F1AD00B9487}.Release|x64.Build.0 = Release|x64
+		{4D015101-111B-4C37-91D7-D87973A70EE2}.Debug|x64.ActiveCfg = Debug|x64
+		{4D015101-111B-4C37-91D7-D87973A70EE2}.Debug|x64.Build.0 = Debug|x64
+		{4D015101-111B-4C37-91D7-D87973A70EE2}.Release|x64.ActiveCfg = Release|x64
+		{4D015101-111B-4C37-91D7-D87973A70EE2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
