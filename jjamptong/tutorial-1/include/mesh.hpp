@@ -58,17 +58,14 @@ const int layoutSize = sizeof(VertexLayout);
 const int numAttribs = sizeof(vLayout) / layoutSize;    // for now numAttribs = 1: only pos
 
 
-typedef std::vector<Vertex> VertexBufferType;
-typedef std::vector<int> IndexBufferType;
-
 /*  Mesh format */
 struct Mesh
 {
     Mesh() : numVertices(0), numTris(0), numIndices(0){ }
 
     /*  Storing the actual vertex/index data */
-    VertexBufferType vertexBuffer;
-    IndexBufferType indexBuffer;
+    std::vector<Vertex> vertexBuffer;
+    std::vector<int> indexBuffer;
 
     int numVertices;
     int numTris;
@@ -98,15 +95,16 @@ Mesh CreateCone(int stacks, int slices);
 /******************************************************************************/
 /*  Pre-defined shapes                                                        */
 /******************************************************************************/
-enum MeshID { PLANE, CUBE, SPHERE, CYLINDER, CONE, PARTIAL_TORUS, TORUS, NUM_MESHES };
+//enum MeshID { PLANE, CUBE, SPHERE, CYLINDER, CONE, PARTIAL_TORUS, TORUS, NUM_MESHES };
+enum MeshID { PLANE, SPHERE, TORUS, NUM_MESHES };
 
 static Mesh mesh[NUM_MESHES] =  {   CreatePlane(50,50),
-                                    CreateCube(1, 1),       /*  For torso, feet */
+                                    //CreateCube(1, 1),       /*  For torso, feet */
                                     CreateSphere(16, 16),   /*  For head */
-                                    CreateCylinder(1, 8),   /*  For arms, legs */
-                                    CreateCone(16, 8),      /*  For hat */
-                                    CreateTorus(4, 8, QUARTER_PI, TWO_PI - QUARTER_PI), /*  For hands */
-                                    CreateTorus(16, 32, 0, TWO_PI)                      /*  For base */
+                                    //CreateCylinder(1, 8),   /*  For arms, legs */
+                                    //CreateCone(16, 8),      /*  For hat */
+                                    //CreateTorus(4, 8, QUARTER_PI, TWO_PI - QUARTER_PI), /*  For hands */
+                                    CreatePlane(16, 32)                      /*  For base */
                                 };
 
 #endif

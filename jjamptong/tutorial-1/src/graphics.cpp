@@ -38,7 +38,7 @@ float leftPlane     = -rightPlane;
 /*  For moving the camera */
 int eyeAlpha    = 1;
 int eyeBeta     = NUM_STEPS_PI / 2;
-int eyeRadius   = EYE_MAX_RADIUS;
+int eyeRadius   = EYE_MAX_RADIUS /2;
 bool eyeMoved   = true;     /*  to trigger view matrix update */
 bool resized    = true;     /*  to trigger projection matrix update */
 
@@ -61,18 +61,10 @@ Mat4 baseMVPMat, wallMVPMat, partMVPMat[NUM_PARTS];
 Mat4 viewMat, projMat, vpMat;
 
 
-/*  Color/depth of background */
-const GLfloat bgColor[] = { 0.0f, 0.6f, 0.0f, 1.0f };
-const GLfloat one = 1.0f;
 
-/*  Non-color vectors, used to trigger texture and normal usage */
-const Vec4 useTexture   = Vec4(-1.0f, -1.0f, -1.0f, -1.0f);
 const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 
-/*  For texture loading/generation */
-GLuint textures[NUM_IMAGES];
-const char *imgFileName[NUM_IMAGES] 
-{ "images/bricks.png", "images/face.png", "images/jeans.png", "images/baloons.png" };
+
 
 
 /*  Shader filenames */
@@ -82,7 +74,7 @@ const char *imgFileName[NUM_IMAGES]
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint textureLoc, colorLoc, mvpMatLoc;
+GLint colorLoc, mvpMatLoc, modelLoc;
 
 GLSLShader shdr_pgm;
 
@@ -108,47 +100,17 @@ void ValidateShader(GLuint shader, const char *file)
 }
 
 
-void ValidateProgram(GLuint program)
-{
-    const unsigned int BUFFER_SIZE = 512;
-    char buffer[BUFFER_SIZE];
-    memset(buffer, 0, BUFFER_SIZE);
-    GLsizei length = 0;
-    GLint status;
-
-    /*  Ask OpenGL to give us the log associated with the program */
-    glGetProgramInfoLog(program, BUFFER_SIZE, &length, buffer); 
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-
-    if (status != GL_TRUE && length > 0)
-    {
-        std::cerr << "Program " << program << " link error: " << buffer << "\n";
-        exit(1);
-    }
-    else
-        std::cout << "Program " << program << " link successful.\n";
-
-    /*  Ask OpenGL to validate the program */
-    glValidateProgram(program);
-    glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
-    if (status == GL_FALSE)
-    {
-        std::cerr << "Error validating shader " << program << ".\n";
-        exit(1);
-    }
-    else
-    {
-        std::cout << "Program " << program << " validation successful.\n";
-    }
-}
-
-
-
 void CompileShaders()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
+
+    //////////////////////////////////////////////////////////////////////////////////////// For P_Modeling
+    //shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
+    //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
+
+    //////////////////////////////////////////////////////////////////////////////////////// For Toon_Shading
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/toon.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/toon.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -226,65 +188,7 @@ void ComputeViewProjMats()
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void SetUpTextures()
-\brief
-        Read texture images from files, then copy them to graphics memory.
-*/
-/******************************************************************************/
-//void SetUpTextures()
-//{
-//    glGenTextures(NUM_IMAGES, textures);
-//    unsigned char *imgData;
-//    int imgWidth, imgHeight, numComponents;
-//
-//    for (int i = 0; i < NUM_IMAGES; ++i)
-//    {
-//        if (ReadImageFile(imgFileName[i], &imgData, &imgWidth, &imgHeight, &numComponents) == 0)
-//        {
-//            std::cerr << "Reading " << imgFileName[i] << " failed.\n";
-//            exit(1);
-//        }
-//
-//        /*  Activate texture memory GL_TEXTURE0 + i for texture image i */
-//        glActiveTexture(GL_TEXTURE0 + i);
-//
-//        /*  Bind corresponding texture ID */
-//        glBindTexture(GL_TEXTURE_2D, textures[i]);
-//
-//        /*  glEnable(GL_TEXTURE_2D) shouldn't be needed, but it seems that there's a bug in old ATI
-//            drivers that require this for glGenerateMipmap to work. */
-//        glEnable(GL_TEXTURE_2D);
-//
-//        /*  Handle image format's padding */
-//        glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
-//
-//        /*  Copy image data to graphics memory */
-//        if (numComponents == 3)
-//            glTexImage2D(   GL_TEXTURE_2D, 0, GL_RGB8, imgWidth, imgHeight, 0, 
-//                            GL_RGB, GL_UNSIGNED_BYTE, imgData);
-//        else
-//            glTexImage2D(   GL_TEXTURE_2D, 0, GL_RGBA8, imgWidth, imgHeight, 0, 
-//                            GL_RGBA, GL_UNSIGNED_BYTE, imgData);
-//
-//        /*  Done with raw image data so delete it */
-//        free(imgData);
-//
-//
-//        /*  Generate texture mipmaps.
-//            Probably won't need many levels of mipmaps,
-//            since texture size is quite close to screen-space size */
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
-//        glGenerateMipmap(GL_TEXTURE_2D);
-//
-//        /*  Set up texture behaviors */
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-//    }
-//}
+
 
 
 /******************************************************************************/
@@ -303,9 +207,9 @@ void SetUp()
 
     /*  Obtain the locations of the variables in the shaders with the given names */
     mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
+    modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
-    textureLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "tex");
-
+    
     ComputeViewProjMats();
 
     //SetUpTextures();
@@ -386,20 +290,22 @@ void UpdateTransform(int partID)
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
 
-    if (GLHelper::currRenderMode == GLHelper::NORMAL)
-        glUniform4fv(colorLoc, 1, ValuePtr(useNormal)); 
+        glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
+
         /*  Trigger shader to use normal for color */
-    else
-    if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
-        glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); 
+
+    /*if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
+        glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); */
         /*  Use obj's color if drawing wireframes or objs that don't have textures */
-    else
-    {
-        glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
-    	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
-    }
+    //else
+    //{
+    //    glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
+    //	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
+    //}
     /*  Send MVP matrix to shaders */
     glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(MVPMat));
+
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, ValuePtr(obj.selfMat));
 
     /*  Tell shader to use obj's VAO for rendering */
         
@@ -462,9 +368,7 @@ void Render()
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
-    glClearBufferfv(GL_COLOR, 0, bgColor);
-    glClearBufferfv(GL_DEPTH, 0, &one);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (GLHelper::animated)
     {
@@ -497,7 +401,7 @@ void Render()
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
-    for (int i = 0; i < NUM_PARTS; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         if (GLHelper::animated || eyeMoved || resized)
             UpdateTransform(i);

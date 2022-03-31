@@ -1,22 +1,30 @@
 #pragma once
-
-#ifndef GLDEMO_H
-#define GLDEMO_H
-
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 #include <glhelper.h>
 
+class GLDemo
+{
+public:
+	GLDemo() {};
+	virtual ~GLDemo() {};
 
-struct GLDemo {
-	static void init();
-	static void update(double delta_time);
-	static void draw();
-	static void cleanup();
-
+	virtual void init() {};
+	virtual void update(double delta_time) {};
+	virtual void draw() {};
+	virtual void cleanup() {};
+private:
 };
 
-#endif
+//
+//struct GLDemo {
+//	static void init();
+//	static void update(double delta_time);
+//	static void draw();
+//	static void cleanup();
+//
+//};
+
 
