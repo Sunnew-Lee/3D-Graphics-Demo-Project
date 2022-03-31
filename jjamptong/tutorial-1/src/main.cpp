@@ -9,7 +9,7 @@
 // CS250
 // 2022 spring
 
-This file uses functionality defined in types GLHelper and GLApp to initialize 
+This file uses functionality defined in types GLHelper and GLApp to initialize
 an OpenGL context and implement a game loop.
 
 *//*__________________________________________________________________________*/
@@ -24,13 +24,10 @@ an OpenGL context and implement a game loop.
 #include <sstream>
 #include <iomanip>
 #include <IG.h>
-#include <glDemo.h>
 
-/*                                                   type declarations
------------------------------------------------------------------------------ */
+#include <Procedural_Modeling.h>
+#include <Toon_Shading-Fog.h>
 
-/*                                                      function declarations
------------------------------------------------------------------------------ */
 static void draw();
 static void update();
 static void init();
@@ -38,55 +35,61 @@ static void cleanup();
 
 //¿¹½Ã
 
+P_Modeling P_Model;
+Toon_Fog toon_fog;
 
 int main() {
-  init();
+	init();
 
-  while (!glfwWindowShouldClose(GLHelper::ptr_window)) {
+	while (!glfwWindowShouldClose(GLHelper::ptr_window)) {
 
-    update();
+		update();
 
-    draw();
-  }
+		draw();
+	}
 
-  cleanup();
+	cleanup();
 }
 
 static void init() {
-    if (!GLHelper::init(1200, 675, "CS250 Project")) {
-        std::cout << "Unable to create OpenGL context" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+	if (!GLHelper::init(1200, 675, "CS250 Project")) {
+		std::cout << "Unable to create OpenGL context" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 
 	//GLApp::init();
-    GLDemo::init();
+	//P_Model.init();
+	toon_fog.init();
 }
 
 static void update() {
-  glfwPollEvents();
+	glfwPollEvents();
 
-  // time between previous and current frame
-  double delta_time = GLHelper::update_time(1.0);
+	// time between previous and current frame
+	double delta_time = GLHelper::update_time(1.0);
 
-  std::stringstream sstr;
-  sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
-  glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
- 
-  //GLApp::update(delta_time);
-  GLDemo::update(delta_time);
+	std::stringstream sstr;
+	sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
+	glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
+
+	//GLApp::update(delta_time);
+	//P_Model.update(delta_time);
+	toon_fog.update(delta_time);
 }
 
 static void draw() {
-   ImGui::Render();
-    
-  //GLApp::draw();
-  GLDemo::draw();
+	ImGui::Render();
 
-  glfwSwapBuffers(GLHelper::ptr_window);
+	//GLApp::draw();
+	//P_Model.draw();
+	toon_fog.draw();
+
+	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
-  //GLApp::cleanup();
-  GLDemo::cleanup();
-  GLHelper::cleanup();
+	//GLApp::cleanup();
+	//P_Model.cleanup();
+	toon_fog.cleanup();
+	GLHelper::cleanup();
 }
