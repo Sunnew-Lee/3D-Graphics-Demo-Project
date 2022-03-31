@@ -291,6 +291,7 @@ void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 {
 
         glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
+
         /*  Trigger shader to use normal for color */
 
     /*if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
@@ -398,6 +399,7 @@ void Render()
     /*  Send the floor data to shaders for rendering */
     UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
+    
 
     for (int i = 0; i < 1; ++i)
     {
