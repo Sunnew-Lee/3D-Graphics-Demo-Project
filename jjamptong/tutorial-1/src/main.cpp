@@ -76,6 +76,7 @@ static void update() {
 	sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
 	glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
 
+
 	//GLApp::update(delta_time);
 	//P_Model.update(delta_time);
 	//toon_fog.update(delta_time);
@@ -84,10 +85,11 @@ static void update() {
 static void draw() {
 	//ImGui::Render();
 
+	
+
 	//GLApp::draw();
 	//P_Model.draw();
 	//toon_fog.draw();
-
 	valueNoise.draw();
 	glfwSwapBuffers(GLHelper::ptr_window);
 }

@@ -86,9 +86,6 @@
     <ClCompile Include="src\Toon_Shading-Fog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Noise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

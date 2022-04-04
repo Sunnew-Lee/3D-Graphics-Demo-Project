@@ -50,5 +50,6 @@ private:
     GLSLShader shdr;
     unsigned int VAO = 0, VBO = 0, EBO = 0;
     std::vector<Vertex> vertices;
+    unsigned char ptr_texels[256][256 * 3] = { 0 };
     std::vector<GLushort> indices;
 };

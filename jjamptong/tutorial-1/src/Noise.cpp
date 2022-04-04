@@ -87,6 +87,7 @@ void ValueNoise::makePPM()
 {
     //GLuint width{ 256 }, height{ 256 };
     float* noiseMap = new float[GLHelper::width * GLHelper::height];
+    
 #if 0 
     // generate white noise
     unsigned seed = 2016;
@@ -104,10 +105,12 @@ void ValueNoise::makePPM()
     // generate value noise
     ValueNoise noise;
     float frequency = 0.05f;
-    for (unsigned j = 0; j < GLHelper::height; ++j) {
-        for (unsigned i = 0; i < GLHelper::width; ++i) {
+    for (unsigned j = 0; j < 256; ++j)
+    {
+        for (unsigned i = 0; i <256*3; ++i)
+        {
             // generate a float in the range [0:1]
-            noiseMap[j * GLHelper::width + i] = noise.eval(Vec2f(i, j) * frequency);
+            ptr_texels[j][i] =static_cast<unsigned char>(noise.eval(Vec2f(i, j) * frequency) * 255.f);
         }
     }
 #endif 
@@ -124,52 +127,6 @@ void ValueNoise::makePPM()
 
    delete[] noiseMap;
 
-    /*GLuint texID;
-    glGenTextures(1, &texID);
-
-    glBindTexture(GL_TEXTURE_2D, texID);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, GLHelper::width, GLHelper::height);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GLHelper::width, GLHelper::height, GL_RGBA, GL_UNSIGNED_BYTE, noiseMap);
-
-    delete[] noiseMap;*/
-
-    //GLubyte* data = new GLubyte[GLHelper::width * GLHelper::height * 4];
-
-    //float xFactor = 1.0f / (GLHelper::width - 1);
-    //float yFactor = 1.0f / (GLHelper::height - 1);
-
-    //for (int row = 0; row < GLHelper::height; row++) {
-    //    for (int col = 0; col < GLHelper::width; col++) {
-    //        float x = xFactor * col;
-    //        float y = yFactor * row;
-    //        float sum = 0.0f;
-    //        float freq = 0.f;
-    //        float scale = 1.f;
-
-    //        // Compute the sum for each octave
-    //        for (int oct = 0; oct < 4; oct++) {
-    //            glm::vec2 p(x * freq, y * freq);
-    //            float val = glm::perlin(p) / scale;
-    //            sum += val;
-    //            float result = (sum + 1.0f) / 2.0f;
-
-    //            // Store in texture buffer
-    //            data[((row * GLHelper::width + col) * 4) + oct] =
-    //                (GLubyte)(result * 255.0f);
-    //            freq *= 2.0f;   // Double the frequency
-    //            scale *= 1.f;     // Next power of b
-    //        }
-    //    }
-    //}
-
-    //GLuint texID;
-    //glGenTextures(1, &texID);
-
-    //glBindTexture(GL_TEXTURE_2D, texID);
-    //glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, GLHelper::width, GLHelper::height);
-    //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GLHelper::width, GLHelper::height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-    //delete[] data;
 }
 
 void ValueNoise::mesh_setup()
@@ -186,8 +143,8 @@ void ValueNoise::mesh_setup()
     }
 
     std::array<glm::vec2, 4> pos_vtx{
-    glm::vec2(1.f, -1.f), glm::vec2(1.f,1.f),
-    glm::vec2(-1.f, 1.f), glm::vec2(-1.f, -1.f)
+    glm::vec2(0.5f, -0.5f), glm::vec2(0.5f,0.5f),
+    glm::vec2(-0.5f, 0.5f), glm::vec2(-0.5f, -0.5f)
     };
     std::array<glm::vec3, 4> clr_vtx{
     glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),
@@ -238,38 +195,44 @@ void ValueNoise::mesh_setup()
 GLuint ValueNoise::texture_setup()
 {
     GLuint width{ 256 }, height{ 256 }, bytes_per_texel{ 4 };
-    char* ptr_texels = nullptr;
-    std::ifstream is("../images/noise.ppm", std::ifstream::binary);
-    if (is) {
-        is.seekg(0, is.end);
-        int length = static_cast<int>(is.tellg());
-        is.seekg(0, is.beg);
-        ptr_texels = new char[length];
-        is.read(ptr_texels, length);
-        is.close();
-    }
-    else {
-        std::cout << "error to open texture binary file";
-    }
+	//char* ptr_texels[256][256 * 3];
+ //   std::ifstream is("../images/noise.ppm", std::ifstream::binary);
+ //   if (is) 
+ //   {
+ //       is.seekg(0, is.end);
+ //       int length = static_cast<int>(is.tellg());
+ //       is.seekg(0, is.beg);
+ //       ptr_texels = new char[length];
+ //       is.read(ptr_texels, length);
+ //       is.close();
+ //   }
 
-    GLuint texobj_hdl;
-    glCreateTextures(GL_TEXTURE_2D, 1, &texobj_hdl);
-    glTextureStorage2D(texobj_hdl, 1, GL_RGBA8, width, height);
-    glTextureSubImage2D(texobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ptr_texels);
-    delete[] ptr_texels;
-    return texobj_hdl;
+
+ //   else
+ //   {
+ //       std::cout << "error to open texture binary file";
+ //   }
+
+   
+    glGenTextures(1, &texobj);
+    glBindTexture(GL_TEXTURE_2D, texobj);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptr_texels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    //delete[] ptr_texels;
+    return texobj;
 }
 
 void ValueNoise::draw()
 {
+    glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     shdr.Use();
 
-    // draw Mesh
+   // // draw Mesh
     glBindVertexArray(VAO);
     glBindTextureUnit(6, texobj);
-   // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     GLuint tex_loc = glGetUniformLocation(shdr.GetHandle(), "uTex2d");
     glUniform1i(tex_loc, 6);
 
