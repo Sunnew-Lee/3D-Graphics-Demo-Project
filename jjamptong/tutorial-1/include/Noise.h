@@ -35,6 +35,8 @@ public:
     void mesh_setup();
     GLuint texture_setup();
     void draw();
+    void update(double delta_time);
+    void cleanUp();
 
 private:
     static const unsigned kMaxTableSize = 256;

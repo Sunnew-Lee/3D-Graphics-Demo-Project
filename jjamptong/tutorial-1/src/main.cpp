@@ -25,8 +25,6 @@ an OpenGL context and implement a game loop.
 #include <iomanip>
 #include <IG.h>
 
-#include <Procedural_Modeling.h>
-#include <Toon_Shading-Fog.h>
 #include <Noise.h>
 
 static void draw();
@@ -36,8 +34,6 @@ static void cleanup();
 
 //¿¹½Ã
 
-P_Modeling P_Model;
-Toon_Fog toon_fog;
 ValueNoise valueNoise;
 
 int main() {
@@ -80,10 +76,11 @@ static void update() {
 	//GLApp::update(delta_time);
 	//P_Model.update(delta_time);
 	//toon_fog.update(delta_time);
+	valueNoise.update(delta_time);
 }
 
 static void draw() {
-	//ImGui::Render();
+	ImGui::Render();
 
 	
 
@@ -98,5 +95,6 @@ static void cleanup() {
 	//GLApp::cleanup();
 	//P_Model.cleanup();
 	//toon_fog.cleanup();
+	valueNoise.cleanUp();
 	GLHelper::cleanup();
 }

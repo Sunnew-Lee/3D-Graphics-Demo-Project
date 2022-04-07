@@ -12,6 +12,8 @@
 
 #include "Noise.h"
 
+#include "IG.h"
+
 
 GLuint texobj;
 
@@ -80,7 +82,7 @@ void ValueNoise::init()
     mesh_setup();
     texture_setup();
 
-   
+    IG::init();
 }
 
 void ValueNoise::makePPM()
@@ -104,7 +106,7 @@ void ValueNoise::makePPM()
 #else 
     // generate value noise
     ValueNoise noise;
-    float frequency = 0.05f;
+    float frequency = 0.5f;
     for (unsigned j = 0; j < 256; ++j)
     {
         for (unsigned i = 0; i <256*3; ++i)
@@ -206,8 +208,6 @@ GLuint ValueNoise::texture_setup()
  //       is.read(ptr_texels, length);
  //       is.close();
  //   }
-
-
  //   else
  //   {
  //       std::cout << "error to open texture binary file";
@@ -240,4 +240,15 @@ void ValueNoise::draw()
     glBindVertexArray(0);
 
     shdr.UnUse();
+    IG::draw();
+}
+
+void ValueNoise::update(double )
+{
+    IG::update();
+}
+
+void ValueNoise::cleanUp()
+{
+    IG::cleanup();
 }
