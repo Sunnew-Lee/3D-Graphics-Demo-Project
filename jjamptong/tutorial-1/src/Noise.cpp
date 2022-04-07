@@ -59,8 +59,8 @@ float ValueNoise::eval(Vec2f const& p) const
     const float& c11 = r[permutationTable[permutationTable[rx1] + ry1]];
 
     // remapping of tx and ty using the Smoothstep function 
-    float sx = smoothstep(tx);
-    float sy = smoothstep(ty);
+    float sx = quintic(tx);
+    float sy = quintic(ty);
 
     // linearly interpolate values along the x axis
     float nx0 = lerp(c00, c10, sx);
@@ -69,7 +69,6 @@ float ValueNoise::eval(Vec2f const& p) const
     // linearly interpolate the nx0/nx1 along they y axis
     return lerp(nx0, nx1, sy);
 }
-
 
 void ValueNoise::init()
 {
