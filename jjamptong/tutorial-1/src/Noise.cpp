@@ -14,8 +14,11 @@
 
 #include "IG.h"
 
-
 GLuint texobj;
+static float frequency = 0.5f;
+static float frequencyMarble = 0.02f;
+static float frequencyWood = 0.01f;
+static const char* current_item = "Value";
 
 ValueNoise::ValueNoise(unsigned seed )
 {
@@ -74,7 +77,6 @@ void ValueNoise::init()
 {
     glClearColor(1.f, 1.f, 1.f, 1.f);
 
-
     GLint w = GLHelper::width, h = GLHelper::height;
     glViewport(0, 0, w, h);
 
@@ -86,26 +88,11 @@ void ValueNoise::init()
 
 void ValueNoise::makePPM()
 {
-    //GLuint width{ 256 }, height{ 256 };
-    float* noiseMap = new float[GLHelper::width * GLHelper::height];
-    
-#if 0 
-    // generate white noise
-    unsigned seed = 2016;
-    std::mt19937 gen(seed);
-    std::uniform_real_distribution distr;
-    auto dice = std::bind(distr, gen); // std::function<float()> 
+    //GLuint width{ 256 }, height{ 256 };    
 
-    for (unsigned j = 0; j < GLHelper::height; ++j) {
-        for (unsigned i = 0; i < GLHelper::width; ++i) {
-            // generate a float in the range [0:1]
-            noiseMap[j * GLHelper::width + i] = dice();
-        }
-    }
-#else 
     // generate value noise
     ValueNoise noise;
-    float frequency = 0.5f;
+    
     for (unsigned j = 0; j < 256; ++j)
     {
         for (unsigned i = 0; i <256*3; ++i)
@@ -114,21 +101,45 @@ void ValueNoise::makePPM()
             ptr_texels[j][i] =static_cast<unsigned char>(noise.eval(Vec2f(i/3, j) * frequency) * 255.f);
         }
     }
-#endif 
-
-   // output noise map to PPM
-   std::ofstream ofs;
-   ofs.open("../images/noise.ppm", std::ios::out | std::ios::binary);
-   ofs << "P6\n" << GLHelper::width << " " << GLHelper::height << "\n255\n";
-   for (unsigned k = 0; k < GLHelper::width * GLHelper::height; ++k) {
-       unsigned char n = static_cast<unsigned char>(noiseMap[k] * 255);
-       ofs << n << n << n;
-   }
-   ofs.close();
-
-   delete[] noiseMap;
 
 }
+
+
+void ValueNoise::makePPM4Marble()
+{
+    ValueNoise noise;
+    //float frequency = 0.02f;
+    float frequencyMult = 1.8;
+    float amplitudeMult = 0.35;
+    unsigned numLayers = 5;
+    for (unsigned j = 0; j < 256; ++j) {
+        for (unsigned i = 0; i < 256*3; ++i) {
+            Vec2f pNoise = Vec2f(i, j) * frequencyMarble;
+            float amplitude = 1;
+            float noiseValue = 0;
+            // compute some fractal noise
+            for (unsigned l = 0; l < numLayers; ++l) {
+                noiseValue += noise.eval(pNoise) * amplitude;
+                pNoise *= frequencyMult;
+                amplitude *= amplitudeMult;
+            }
+            // we "displace" the value i used in the sin() expression by noiseValue * 100
+            ptr_texels[j][ i] = ((sin((i + noiseValue * 100) * 2 * acos(-1) / 200.f) + 1) / 2.f) * 255.f;
+        }
+    }
+}
+
+void ValueNoise::makePPM4Wood()
+{
+    ValueNoise noise;
+    for (unsigned j = 0; j < 256; ++j) {
+        for (unsigned i = 0; i < 256*3; ++i) {
+            float g = noise.eval(Vec2f(i, j) * frequencyWood) * 10;
+            ptr_texels[j ][ i] = (g - (int)g) * 255.f;
+        }
+    }
+}
+
 
 void ValueNoise::mesh_setup()
 {
@@ -197,20 +208,6 @@ GLuint ValueNoise::texture_setup()
 {
     GLuint width{ 256 }, height{ 256 }, bytes_per_texel{ 4 };
 	//char* ptr_texels[256][256 * 3];
- //   std::ifstream is("../images/noise.ppm", std::ifstream::binary);
- //   if (is) 
- //   {
- //       is.seekg(0, is.end);
- //       int length = static_cast<int>(is.tellg());
- //       is.seekg(0, is.beg);
- //       ptr_texels = new char[length];
- //       is.read(ptr_texels, length);
- //       is.close();
- //   }
- //   else
- //   {
- //       std::cout << "error to open texture binary file";
- //   }
 
    
     glGenTextures(1, &texobj);
@@ -225,7 +222,6 @@ GLuint ValueNoise::texture_setup()
 
 void ValueNoise::draw()
 {
-    glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     shdr.Use();
 
@@ -245,6 +241,68 @@ void ValueNoise::draw()
 void ValueNoise::update(double )
 {
     IG::update();
+    if (current_item == "Value") {
+        if (ImGui::SliderFloat("frequency", &frequency, 0.05f, 0.5f))
+        {
+            //isChanged = true;
+            mesh_setup();
+            texture_setup();
+            makePPM();
+        }
+    }
+    if(current_item == "Marble")
+    {
+        if (ImGui::SliderFloat("frequency", &frequencyMarble, 0.02f, 0.25f))
+        {
+            //isChanged = true;
+            mesh_setup();
+            texture_setup();
+            makePPM4Marble();
+        }
+    }
+    if(current_item == "Wood")
+    {
+        if (ImGui::SliderFloat("frequency", &frequencyWood, 0.01f, 0.25f))
+        {
+            //isChanged = true;
+            mesh_setup();
+            texture_setup();
+            makePPM4Wood();
+        }
+    }
+
+    if (ImGui::BeginCombo("Change type", current_item)) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+            if (ImGui::Selectable(items[n])) {
+                current_item = items[n];
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                }
+                if (current_item == "Value")
+                {
+                    mesh_setup();
+                    texture_setup();
+                    makePPM();
+                }
+                if (current_item == "Marble")
+                {
+                    mesh_setup();
+                    texture_setup();
+                    makePPM4Marble();
+                }
+                if (current_item == "Wood")
+                {
+                    mesh_setup();
+                    texture_setup();
+                    makePPM4Wood();
+                }
+            }
+        }
+        ImGui::EndCombo();
+    }
 }
 
 void ValueNoise::cleanUp()

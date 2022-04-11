@@ -12,6 +12,7 @@ public:
     Vec2() : x(T(0)), y(T(0)) {}
     Vec2(T xx, T yy) : x(xx), y(yy) {}
     Vec2 operator * (const T& r) const { return Vec2(x * r, y * r); }
+    Vec2& operator *= (const T& r) { x *= r, y *= r; return *this; }
     T x, y;
 };
 
@@ -44,6 +45,8 @@ public:
     float eval(Vec2f const& p) const;
     void init();
     void makePPM();
+    void makePPM4Marble();
+    void makePPM4Wood();
     void mesh_setup();
     GLuint texture_setup();
     void draw();
@@ -66,4 +69,7 @@ private:
     std::vector<Vertex> vertices;
     unsigned char ptr_texels[256][256 * 3] = { 0 };
     std::vector<GLushort> indices;
+
+
+    const char* items[3] = { "Value", "Marble", "Wood"};
 };
