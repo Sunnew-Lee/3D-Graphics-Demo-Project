@@ -25,7 +25,8 @@ an OpenGL context and implement a game loop.
 #include <iomanip>
 #include <IG.h>
 
-#include <Noise.h>
+//#include <Noise.h>
+#include <PerlinNoise.h>
 
 static void draw();
 static void update();
@@ -34,7 +35,8 @@ static void cleanup();
 
 //¿¹½Ã
 
-ValueNoise valueNoise;
+//ValueNoise valueNoise;
+PerlinNoise perlinNoise;
 
 int main() {
 	init();
@@ -58,8 +60,11 @@ static void init() {
 	//GLApp::init();
 	//P_Model.init();
 	//toon_fog.init();
-	valueNoise.makePPM();
-	valueNoise.init();
+	//valueNoise.makePPM();
+	//valueNoise.init();
+	perlinNoise.makePPM();
+	perlinNoise.init();
+
 }
 
 static void update() {
@@ -76,18 +81,20 @@ static void update() {
 	//GLApp::update(delta_time);
 	//P_Model.update(delta_time);
 	//toon_fog.update(delta_time);
-	valueNoise.update(delta_time);
+	//valueNoise.update(delta_time);
+	perlinNoise.update(delta_time);
+
 }
 
 static void draw() {
 	ImGui::Render();
 
-	
 
 	//GLApp::draw();
 	//P_Model.draw();
 	//toon_fog.draw();
-	valueNoise.draw();
+	//valueNoise.draw();
+	perlinNoise.draw();
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
@@ -95,6 +102,7 @@ static void cleanup() {
 	//GLApp::cleanup();
 	//P_Model.cleanup();
 	//toon_fog.cleanup();
-	valueNoise.cleanUp();
+	//valueNoise.cleanUp();
+	perlinNoise.cleanup();
 	GLHelper::cleanup();
 }

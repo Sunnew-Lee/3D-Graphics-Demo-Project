@@ -111,7 +111,7 @@ void ValueNoise::makePPM()
         for (unsigned i = 0; i <256*3; ++i)
         {
             // generate a float in the range [0:1]
-            ptr_texels[j][i] =static_cast<unsigned char>(noise.eval(Vec2f(i, j) * frequency) * 255.f);
+            ptr_texels[j][i] =static_cast<unsigned char>(noise.eval(Vec2f(i/3, j) * frequency) * 255.f);
         }
     }
 #endif 
