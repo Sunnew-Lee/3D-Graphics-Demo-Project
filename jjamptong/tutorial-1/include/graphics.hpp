@@ -43,19 +43,21 @@ extern int eyeAlpha, eyeBeta;
 extern int eyeRadius;
 extern bool eyeMoved;
 /*  Limit for camera angle */
-const int EYE_MAX_ALPHA     = NUM_STEPS_PI / 2 - 1;
-const int EYE_MIN_ALPHA     = -EYE_MAX_ALPHA + 1;
-const int EYE_ANGLE_STEP    = 1;
+const int EYE_MAX_ALPHA = NUM_STEPS_PI / 2 - 1;
+const int EYE_MIN_ALPHA = -EYE_MAX_ALPHA + 1;
+const int EYE_ANGLE_STEP = 1;
 /*  Limit for camera distance from the origin */
-const int EYE_MAX_RADIUS    = 30;
-const int EYE_MIN_RADIUS    = 1;
-const int EYE_RADIUS_STEP   = 1;
+const int EYE_MAX_RADIUS = 30;
+const int EYE_MIN_RADIUS = 1;
+const int EYE_RADIUS_STEP = 1;
 
 
 /*  Public functions */
 void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
-void Render();
+void Render(double delta_time);
+inline Mesh* terrain;
+inline bool do_once = true;
 
 #endif
