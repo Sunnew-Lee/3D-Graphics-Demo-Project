@@ -75,6 +75,16 @@ inline float smoothstep(const float& t)
     return t * t * (3 - 2 * t);
 }
 
+inline float quintic(const float& t)
+{
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+inline float quinticDeriv(const float& t)
+{
+    return 30 * t * t * (t * (t - 2) + 1);
+}
+
 class PolyMesh
 {
 public:
@@ -99,6 +109,7 @@ class PerlinNoise
 public:
     PerlinNoise(const unsigned& seed = 2016);
     void makePPM();
+    void makePPM4Quintic();
     virtual ~PerlinNoise() {}
     /* inline */
     
@@ -125,13 +136,17 @@ private:
     std::vector<Vertex> vertices;
     unsigned char ptr_texels[256][256*3] = { 0 };
     //unsigned char ptr_texels
-    float* noiseMap = nullptr;
+    //float* noiseMap = nullptr;
 	std::vector<GLushort> indices;
 
     int hash(const int& x, const int& y, const int& z) const;
-
     float eval(const Vec3f& p, Vec3f& derivs) const;
 
-    bool isChanged = false;
+    float gradientDotV(uint8_t perm, float x, float y, float z) const;
+    float eval4Quintic(const Vec3f& p, Vec3f& derivs) const;
+
+    const char* items[3] = { "Gradient", "Quintic", "3D" };
+    
     
 };
+
