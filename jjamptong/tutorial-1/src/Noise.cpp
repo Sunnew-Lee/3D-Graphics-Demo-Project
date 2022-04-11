@@ -1,3 +1,8 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
+
 #include <cstdio> 
 #include <random> 
 #include <functional> 
@@ -238,7 +243,7 @@ void ValueNoise::draw()
     IG::draw();
 }
 
-void ValueNoise::update(double )
+void ValueNoise::update(double delta_time )
 {
     IG::update();
     if (current_item == "Value") {
@@ -278,30 +283,32 @@ void ValueNoise::update(double )
             bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
             if (ImGui::Selectable(items[n])) {
                 current_item = items[n];
+
                 if (is_selected) {
                     ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
                 }
+
                 if (current_item == "Value")
                 {
+                    makePPM();
                     mesh_setup();
                     texture_setup();
-                    makePPM();
                 }
                 if (current_item == "Marble")
                 {
+                    makePPM4Marble();
                     mesh_setup();
                     texture_setup();
-                    makePPM4Marble();
                 }
                 if (current_item == "Wood")
                 {
+                    makePPM4Wood();
                     mesh_setup();
                     texture_setup();
-                    makePPM4Wood();
                 }
             }
         }
-        ImGui::EndCombo();
+	ImGui::EndCombo();
     }
 }
 
