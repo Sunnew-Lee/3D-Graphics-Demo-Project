@@ -251,8 +251,8 @@ void ValueNoise::update(double delta_time )
         {
             //isChanged = true;
             mesh_setup();
-            texture_setup();
             makePPM();
+            texture_setup();
         }
     }
     if(current_item == "Marble")
@@ -261,8 +261,8 @@ void ValueNoise::update(double delta_time )
         {
             //isChanged = true;
             mesh_setup();
-            texture_setup();
             makePPM4Marble();
+            texture_setup();
         }
     }
     if(current_item == "Wood")
@@ -271,8 +271,8 @@ void ValueNoise::update(double delta_time )
         {
             //isChanged = true;
             mesh_setup();
-            texture_setup();
             makePPM4Wood();
+            texture_setup();
         }
     }
 
