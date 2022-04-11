@@ -5,6 +5,8 @@
 ----------------------------------------------------------------------------- */
 //static GLNew    g_glnew;
 
+static float frequency = 64.f;
+
 void Perlin_Terrain::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
@@ -27,9 +29,15 @@ void Perlin_Terrain::init() {
 
 void Perlin_Terrain::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	Render(delta_time);
+	Render(delta_time, frequency);
 
 	IG::update();
+	ImGui::SliderFloat("frequency", &frequency, 2.0f, 64.0f);
+	//if (ImGui::SliderFloat("frequency", &frequency, -0.5f, 5.0f))
+	//{
+	//	//isChanged = true;
+	//	//Render(delta_time, frequency);
+	//}
 }
 
 void Perlin_Terrain::draw() {

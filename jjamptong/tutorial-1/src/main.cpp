@@ -40,6 +40,12 @@ static void cleanup();
 PerlinNoise perlinNoise;
 Perlin_Terrain perlinTerrain;
 
+
+//**********************************************************************************************************//
+//Release ----> PerlinNoise
+//Debug	  ----> PerlinTerrain
+//**********************************************************************************************************//
+
 int main() {
 	init();
 
@@ -65,10 +71,13 @@ static void init() {
 	//valueNoise.makePPM();
 	//valueNoise.init();
 
-	//perlinNoise.makePPM();
-	//perlinNoise.init();
-
+#ifdef _DEBUG
 	perlinTerrain.init();
+#else
+	
+	perlinNoise.makePPM();
+	perlinNoise.init();
+#endif
 }
 
 static void update() {
@@ -87,9 +96,12 @@ static void update() {
 	//toon_fog.update(delta_time);
 	//valueNoise.update(delta_time);
 
-	//perlinNoise.update(delta_time);
+#ifdef _DEBUG
 	perlinTerrain.update(delta_time);
-
+	
+#else
+	perlinNoise.update(delta_time);
+#endif
 }
 
 static void draw() {
@@ -101,9 +113,13 @@ static void draw() {
 	//toon_fog.draw();
 	//valueNoise.draw();
 
-	//perlinNoise.draw();
+#ifdef _DEBUG
+	
 	perlinTerrain.draw();
-
+#else
+	perlinNoise.draw();
+#endif
+	
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
@@ -113,7 +129,12 @@ static void cleanup() {
 	//toon_fog.cleanup();
 	//valueNoise.cleanUp();
 
-	//perlinNoise.cleanup();
+#ifdef _DEBUG
 	perlinTerrain.cleanup();
+	
+#else
+	perlinNoise.cleanup();
+#endif
+
 	GLHelper::cleanup();
 }

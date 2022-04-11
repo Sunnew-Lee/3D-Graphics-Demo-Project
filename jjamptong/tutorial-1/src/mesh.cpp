@@ -65,9 +65,9 @@ Mesh CreatePlane(int stacks, int slices)
     return mesh;
 }
 
-Mesh CreateTerrain(int stacks, int slices, double dt)
+Mesh CreateTerrain(int stacks, int slices, double dt , float& frequency)
 {
-    x_pos += dt / 2;
+    x_pos += dt*3;
     Mesh mesh;
     Perlin_Noise perlinnoise(2016);
 
@@ -81,7 +81,7 @@ Mesh CreateTerrain(int stacks, int slices, double dt)
 
             Vertex v;
             glm::vec3 derivs;
-            float pos_z = (perlinnoise.eval(Vec3(col - 0.5f + x_pos, 0.5f - row, 0.0f) * 3.f, derivs));
+            float pos_z = (perlinnoise.eval(Vec3(slice - 0.5f +x_pos , 0.5f - stack, 0.0f) * (1/frequency), derivs));
 
             v.pos = Vec3(col - 0.5f, 0.5f - row, pos_z);
             v.nrm = Vec3(derivs.x, derivs.y, -1);

@@ -130,7 +130,7 @@ Mesh CreateTorus(int stacks, int slices, float startAngle, float endAngle);
 Mesh CreateCylinder(int stacks, int slices);
 Mesh CreateCone(int stacks, int slices);
 
-Mesh CreateTerrain(int stacks, int slices, double dt);
+Mesh CreateTerrain(int stacks, int slices, double dt, float& frequency);
 
 
 

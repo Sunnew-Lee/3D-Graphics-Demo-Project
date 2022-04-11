@@ -7,7 +7,7 @@ PerlinNoise noise;
 
 Vec3f derivs;
 static float frequency = 64.f;
-static const char* current_item = "Gradient";
+static const char* current_item = "SmoothStep";
 
 PerlinNoise::PerlinNoise(const unsigned& seed ) 
 {
@@ -303,7 +303,7 @@ void PerlinNoise::update(double)
         //isChanged = true;
         mesh_setup();
         texture_setup();
-        if (current_item == "Gradient") {
+        if (current_item == "SmoothStep") {
             makePPM();
         }
         if (current_item == "Quintic")
@@ -313,7 +313,7 @@ void PerlinNoise::update(double)
     }
 
 
-    if (ImGui::BeginCombo("Change type", current_item)) // The second parameter is the label previewed before opening the combo.
+    if (ImGui::BeginCombo("Change method", current_item)) // The second parameter is the label previewed before opening the combo.
     {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
         {
@@ -329,7 +329,7 @@ void PerlinNoise::update(double)
                     texture_setup();
                     makePPM4Quintic();
                 }
-            	if (current_item == "Gradient")
+            	if (current_item == "SmoothStep")
                 {
                     mesh_setup();
                     texture_setup();

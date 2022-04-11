@@ -145,7 +145,7 @@ private:
     float gradientDotV(uint8_t perm, float x, float y, float z) const;
     float eval4Quintic(const Vec3f& p, Vec3f& derivs) const;
 
-    const char* items[3] = { "Gradient", "Quintic", "3D" };
+    const char* items[2] = { "SmoothStep", "Quintic" };
     
     
 };

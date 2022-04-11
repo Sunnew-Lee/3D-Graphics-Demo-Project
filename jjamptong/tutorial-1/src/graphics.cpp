@@ -371,7 +371,7 @@ void Resize(int w, int h)
         Render function for update & drawing.
 */
 /******************************************************************************/
-void Render(double delta_time)
+void Render(double delta_time, float& frequency)
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
@@ -385,7 +385,7 @@ void Render(double delta_time)
     //    GLHelper::justAnimated = GL_FALSE;
     //}
 
-    terrain = new Mesh(CreateTerrain(16, 32, delta_time));
+    terrain = new Mesh(CreateTerrain(16, 32, delta_time, frequency));
     //currTime = tempTime;
     /*  We subtract idleTime as well, to keep the animation smooth after the pause */
     //secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
