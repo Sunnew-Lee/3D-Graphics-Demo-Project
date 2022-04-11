@@ -307,7 +307,6 @@ void PerlinNoise::update(double)
     {
         //isChanged = true;
         mesh_setup();
-        texture_setup();
         if (current_item == "SmoothStep") {
             makePPM();
         }
@@ -315,6 +314,7 @@ void PerlinNoise::update(double)
         {
             makePPM4Quintic();
         }
+        texture_setup();
     }
 
 
@@ -331,14 +331,14 @@ void PerlinNoise::update(double)
                 if (current_item == "Quintic")
                 {
                     mesh_setup();
-                    texture_setup();
                     makePPM4Quintic();
+                    texture_setup();
                 }
             	if (current_item == "SmoothStep")
                 {
                     mesh_setup();
-                    texture_setup();
                     makePPM();
+                    texture_setup();
                 }
             }
         }
