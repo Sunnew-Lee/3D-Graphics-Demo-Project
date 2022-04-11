@@ -6,7 +6,7 @@ GLuint texobj;
 PerlinNoise noise;
 
 Vec3f derivs;
-
+static float frequency = 64.f;
 
 PerlinNoise::PerlinNoise(const unsigned& seed )
 {
@@ -213,7 +213,7 @@ GLuint PerlinNoise::texture_setup()
 
 void PerlinNoise::init()
 {
-    glClearColor(1.f, 1.f, 1.f, 1.f);
+   // glClearColor(1.f, 1.f, 1.f, 1.f);
 
     GLint w = GLHelper::width, h = GLHelper::height;
     glViewport(0, 0, w, h);
@@ -229,6 +229,9 @@ void PerlinNoise::update(double)
     IG::update();
     if (ImGui::SliderFloat("frequency", &frequency, 2.0f, 64.0f))
     {
+        //isChanged = true;
+        mesh_setup();
+        texture_setup();
         makePPM();
     }
   
@@ -239,7 +242,6 @@ void PerlinNoise::draw()
     glClear(GL_COLOR_BUFFER_BIT);
 
     shdr.Use();
-
     // // draw Mesh
     glBindVertexArray(VAO);
     glBindTextureUnit(6, texobj);

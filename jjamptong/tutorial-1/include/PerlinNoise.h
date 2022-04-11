@@ -131,4 +131,7 @@ private:
     int hash(const int& x, const int& y, const int& z) const;
 
     float eval(const Vec3f& p, Vec3f& derivs) const;
+
+    bool isChanged = false;
+    
 };
