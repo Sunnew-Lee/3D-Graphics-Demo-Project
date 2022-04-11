@@ -7,8 +7,9 @@ PerlinNoise noise;
 
 Vec3f derivs;
 static float frequency = 64.f;
+static const char* current_item = "Gradient";
 
-PerlinNoise::PerlinNoise(const unsigned& seed )
+PerlinNoise::PerlinNoise(const unsigned& seed ) 
 {
     std::mt19937 generator(seed);
     std::uniform_real_distribution<float> distribution;
@@ -108,30 +109,99 @@ float PerlinNoise::eval(const Vec3f& p, Vec3f& derivs) const
     return lerp(e, f, w); // g 
 }
 
+float PerlinNoise::gradientDotV(uint8_t perm, float x, float y, float z) const
+{
+    switch (perm & 15) {
+    case  0: return  x + y; // (1,1,0) 
+    case  1: return -x + y; // (-1,1,0) 
+    case  2: return  x - y; // (1,-1,0) 
+    case  3: return -x - y; // (-1,-1,0) 
+    case  4: return  x + z; // (1,0,1) 
+    case  5: return -x + z; // (-1,0,1) 
+    case  6: return  x - z; // (1,0,-1) 
+    case  7: return -x - z; // (-1,0,-1) 
+    case  8: return  y + z; // (0,1,1), 
+    case  9: return -y + z; // (0,-1,1), 
+    case 10: return  y - z; // (0,1,-1), 
+    case 11: return -y - z; // (0,-1,-1) 
+    case 12: return  y + x; // (1,1,0) 
+    case 13: return -x + y; // (-1,1,0) 
+    case 14: return -y + z; // (0,-1,1) 
+    case 15: return -y - z; // (0,-1,-1) 
+    }
+}
+
+float PerlinNoise::eval4Quintic(const Vec3f& p, Vec3f& derivs) const
+{
+    int xi0 = ((int)std::floor(p.x)) & tableSizeMask;
+    int yi0 = ((int)std::floor(p.y)) & tableSizeMask;
+    int zi0 = ((int)std::floor(p.z)) & tableSizeMask;
+
+    int xi1 = (xi0 + 1) & tableSizeMask;
+    int yi1 = (yi0 + 1) & tableSizeMask;
+    int zi1 = (zi0 + 1) & tableSizeMask;
+
+    float tx = p.x - ((int)std::floor(p.x));
+    float ty = p.y - ((int)std::floor(p.y));
+    float tz = p.z - ((int)std::floor(p.z));
+
+    float u = quintic(tx);
+    float v = quintic(ty);
+    float w = quintic(tz);
+
+    // generate vectors going from the grid points to p
+    float x0 = tx, x1 = tx - 1;
+    float y0 = ty, y1 = ty - 1;
+    float z0 = tz, z1 = tz - 1;
+
+    float a = gradientDotV(hash(xi0, yi0, zi0), x0, y0, z0);
+    float b = gradientDotV(hash(xi1, yi0, zi0), x1, y0, z0);
+    float c = gradientDotV(hash(xi0, yi1, zi0), x0, y1, z0);
+    float d = gradientDotV(hash(xi1, yi1, zi0), x1, y1, z0);
+    float e = gradientDotV(hash(xi0, yi0, zi1), x0, y0, z1);
+    float f = gradientDotV(hash(xi1, yi0, zi1), x1, y0, z1);
+    float g = gradientDotV(hash(xi0, yi1, zi1), x0, y1, z1);
+    float h = gradientDotV(hash(xi1, yi1, zi1), x1, y1, z1);
+
+    float du = quinticDeriv(tx);
+    float dv = quinticDeriv(ty);
+    float dw = quinticDeriv(tz);
+
+    float k0 = a;
+    float k1 = (b - a);
+    float k2 = (c - a);
+    float k3 = (e - a);
+    float k4 = (a + d - b - c);
+    float k5 = (a + f - b - e);
+    float k6 = (a + g - c - e);
+    float k7 = (b + c + e + h - a - d - f - g);
+
+    derivs.x = du * (k1 + k4 * v + k5 * w + k7 * v * w);
+    derivs.y = dv * (k2 + k4 * u + k6 * w + k7 * v * w);
+    derivs.z = dw * (k3 + k5 * u + k6 * v + k7 * v * w);
+
+    return k0 + k1 * u + k2 * v + k3 * w + k4 * u * v + k5 * u * w + k6 * v * w + k7 * u * v * w;
+
+}
+
+
 void PerlinNoise::makePPM()
 {
-
-    // output noise map to PPM
-    const uint32_t width = 512, height = 512;
-    noiseMap = new float[width * height];
 
     for (uint32_t j = 0; j < 256; ++j) {
         for (uint32_t i = 0; i < 256 * 3; ++i) {
             ptr_texels[j][i] = (noise.eval(Vec3f(i / 3, 0, j) * (1 / frequency), derivs) + 1) * 0.5f * 255.f;
         }
     }
+}
 
-    /*std::ofstream ofs;
-    ofs.open("../images/perlin.ppm", std::ios::out | std::ios::binary);
-    ofs << "P6\n" << width << " " << height << "\n255\n";
-    for (unsigned k = 0; k < width * height; ++k) {
-        unsigned char n = static_cast<unsigned char>(noiseMap[k] * 255);
-        ofs << n << n << n;
+void PerlinNoise::makePPM4Quintic()
+{
+    for (uint32_t j = 0; j < 256; ++j) {
+        for (uint32_t i = 0; i < 256 * 3; ++i) {
+            ptr_texels[j][i] = (noise.eval4Quintic(Vec3f(i / 3, 0, j) * (1 / frequency), derivs) + 1) * 0.5f * 255.f;
+        }
     }
-    ofs.close();*/
-
-    delete[] noiseMap;
-    
 }
 
 void PerlinNoise::mesh_setup()
@@ -214,7 +284,8 @@ GLuint PerlinNoise::texture_setup()
 void PerlinNoise::init()
 {
    // glClearColor(1.f, 1.f, 1.f, 1.f);
-
+    
+    
     GLint w = GLHelper::width, h = GLHelper::height;
     glViewport(0, 0, w, h);
 
@@ -232,9 +303,44 @@ void PerlinNoise::update(double)
         //isChanged = true;
         mesh_setup();
         texture_setup();
-        makePPM();
+        if (current_item == "Gradient") {
+            makePPM();
+        }
+        if (current_item == "Quintic")
+        {
+            makePPM4Quintic();
+        }
     }
-  
+
+
+    if (ImGui::BeginCombo("Change type", current_item)) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+        {
+            bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+            if (ImGui::Selectable(items[n])) {
+                current_item = items[n];
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                }
+                if (current_item == "Quintic")
+                {
+                    mesh_setup();
+                    texture_setup();
+                    makePPM4Quintic();
+                }
+            	if (current_item == "Gradient")
+                {
+                    mesh_setup();
+                    texture_setup();
+                    makePPM();
+                }
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    
 }  
 
 void PerlinNoise::draw()
