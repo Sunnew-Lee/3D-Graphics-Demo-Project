@@ -67,7 +67,7 @@ Mesh CreatePlane(int stacks, int slices)
 
 Mesh CreateTerrain(int stacks, int slices, double dt , float& frequency)
 {
-    x_pos += dt*3;
+    x_pos += dt*5;
     Mesh mesh;
     Perlin_Noise perlinnoise(2016);
 

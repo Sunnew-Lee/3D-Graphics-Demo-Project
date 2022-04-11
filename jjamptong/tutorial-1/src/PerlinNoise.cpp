@@ -184,7 +184,7 @@ float PerlinNoise::eval4Quintic(const Vec3f& p, Vec3f& derivs) const
 
 }
 
-
+// store perlin noise data in ptr_texels -> method smoothstep
 void PerlinNoise::makePPM()
 {
 
@@ -195,6 +195,7 @@ void PerlinNoise::makePPM()
     }
 }
 
+// store perlin noise data in ptr_texels -> method quintic
 void PerlinNoise::makePPM4Quintic()
 {
     for (uint32_t j = 0; j < 256; ++j) {
@@ -204,6 +205,7 @@ void PerlinNoise::makePPM4Quintic()
     }
 }
 
+// set up shaders and vertex
 void PerlinNoise::mesh_setup()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
@@ -267,6 +269,7 @@ void PerlinNoise::mesh_setup()
     glBindVertexArray(0);
 }
 
+// set up texture
 GLuint PerlinNoise::texture_setup()
 {
     GLuint width{ 256 }, height{ 256 }, bytes_per_texel{ 4 };
@@ -281,6 +284,7 @@ GLuint PerlinNoise::texture_setup()
     return texobj;
 }
 
+// set up perlin noise
 void PerlinNoise::init()
 {
    // glClearColor(1.f, 1.f, 1.f, 1.f);
@@ -295,6 +299,7 @@ void PerlinNoise::init()
     IG::init();
 }
 
+// re-set up every time the frequency or method changes
 void PerlinNoise::update(double)
 {
     IG::update();
@@ -343,6 +348,7 @@ void PerlinNoise::update(double)
     
 }  
 
+// draw the data
 void PerlinNoise::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT);
