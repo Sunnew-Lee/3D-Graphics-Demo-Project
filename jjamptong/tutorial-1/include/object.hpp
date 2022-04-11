@@ -78,9 +78,9 @@ const Object wall
 const Object base   
                 {
                     PLANE,
-                    Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
-                    Translate(0.0f, -7.5f, 0.0f)* Rotate(PI/2., XAXIS)
-                    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+                    Vec4(0.0f ,0.3f,0.0f, 1.0f),                               /*  Color */
+                    Translate(0.0f, -7.5f, -60.0f)* Rotate(3*PI/5, XAXIS)
+                    * Scale(80.5f, 80.0f, 20.5f),                             /*  Self-transform */
                     Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
                     YAXIS,                                                      /*  Rotation w.r.t. parent */
                     0.0f
@@ -88,8 +88,8 @@ const Object base
                 };
 
 
-const Object part[1] 
-                {
+//const Object part[1] 
+                //{
                     //{   /*  TORSO       */
                     //    CUBE,
                     //    Vec4(Torso_color.x,Torso_color.y,Torso_color.z,Torso_color.w),                           /*  Color */
@@ -98,16 +98,16 @@ const Object part[1]
                     //    YAXIS,                                                  /*  Rotation w.r.t. parent */
                     //    1.0f
                     //},
-                    {
-                        /*  HEAD        */
-                        SPHERE,
-                        Vec4(Head_color.x,Head_color.y,Head_color.z,Head_color.w),                         /*  Color */
-                        Scale(10.f, 10.f, 10.f),                                /*  Self-transform */
-                        Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
-                        YAXIS,                                                  /*  Rotation w.r.t. parent */
-                        0.0f
-                                                                          /*  Texture image ID */
-                    },
+                    //{
+                    //    /*  HEAD        */
+                    //    SPHERE,
+                    //    Vec4(Head_color.x,Head_color.y,Head_color.z,Head_color.w),                         /*  Color */
+                    //    Scale(10.f, 10.f, 10.f),                                /*  Self-transform */
+                    //    Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
+                    //    YAXIS,                                                  /*  Rotation w.r.t. parent */
+                    //    0.0f
+                    //                                                      /*  Texture image ID */
+                    //},
                     //{   /*  HAT         */
                     //    CONE,
                     //    Vec4(Hat_color.x,Hat_color.y,Hat_color.z,Hat_color.w),                        /*  Color */
@@ -177,6 +177,6 @@ const Object part[1]
                     //    XAXIS,                                                  /*  Rotation w.r.t. parent */
                     //    EIGHTH_PI
                     //},
-                };
+                //};
 
 #endif

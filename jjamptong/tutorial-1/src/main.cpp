@@ -27,6 +27,7 @@ an OpenGL context and implement a game loop.
 
 #include <Procedural_Modeling.h>
 #include <Toon_Shading-Fog.h>
+#include <Perlin_Terrain.h>
 
 static void draw();
 static void update();
@@ -37,6 +38,7 @@ static void cleanup();
 
 P_Modeling P_Model;
 Toon_Fog toon_fog;
+Perlin_Terrain perlin_terrian;
 
 int main() {
 	init();
@@ -59,7 +61,8 @@ static void init() {
 
 	//GLApp::init();
 	//P_Model.init();
-	toon_fog.init();
+	//toon_fog.init();
+	perlin_terrian.init();
 }
 
 static void update() {
@@ -74,7 +77,8 @@ static void update() {
 
 	//GLApp::update(delta_time);
 	//P_Model.update(delta_time);
-	toon_fog.update(delta_time);
+	//toon_fog.update(delta_time);
+	perlin_terrian.update(delta_time);
 }
 
 static void draw() {
@@ -82,7 +86,8 @@ static void draw() {
 
 	//GLApp::draw();
 	//P_Model.draw();
-	toon_fog.draw();
+	//toon_fog.draw();
+	perlin_terrian.draw();
 
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
@@ -90,6 +95,7 @@ static void draw() {
 static void cleanup() {
 	//GLApp::cleanup();
 	//P_Model.cleanup();
-	toon_fog.cleanup();
+	//toon_fog.cleanup();
+	perlin_terrian.cleanup();
 	GLHelper::cleanup();
 }

@@ -1,11 +1,11 @@
-#include <Toon_Shading-Fog.h>
+#include <Perlin_Terrain.h>
 #include <IG.h>
 #include <graphics.hpp>
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
 //static GLNew    g_glnew;
 
-void Toon_Fog::init() {
+void Perlin_Terrain::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
 	SetUp();
@@ -25,21 +25,21 @@ void Toon_Fog::init() {
 	IG::init();
 }
 
-void Toon_Fog::update(double delta_time) {
+void Perlin_Terrain::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	//Render();
+	Render(delta_time);
 
 	IG::update();
 }
 
-void Toon_Fog::draw() {
+void Perlin_Terrain::draw() {
 	//glClear(GL_COLOR_BUFFER_BIT);
 
 	//mdl.draw();
 	IG::draw();
 }
 
-void Toon_Fog::cleanup() {
+void Perlin_Terrain::cleanup() {
 	// empty for now
 	IG::cleanup();
 }

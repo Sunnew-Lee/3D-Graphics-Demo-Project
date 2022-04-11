@@ -51,6 +51,9 @@
     <ClInclude Include="include\Toon_Shading-Fog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Perlin_Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\glapp.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Toon_Shading-Fog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Perlin_Terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

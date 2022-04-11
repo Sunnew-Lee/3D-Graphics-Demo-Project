@@ -27,7 +27,7 @@ int height  = 675;
 
 /*  Camera view volume planes */
 float nearPlane     = 1.0f;
-float farPlane      = 80.0f;
+float farPlane      = 1000.0f;
 float topPlane      = 0.6f * nearPlane;
 float bottomPlane   = -topPlane;
 float aspect        = 1.0f * width / height;
@@ -109,8 +109,8 @@ void CompileShaders()
     //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
 
     //////////////////////////////////////////////////////////////////////////////////////// For Toon_Shading
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/toon.vert"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/toon.frag"));
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -134,17 +134,24 @@ void CompileShaders()
 /******************************************************************************/
 void SendVertexData(Mesh &mesh)
 {
-    glGenVertexArrays(1, &mesh.VAO);
+    if (do_once)
+    {
+        glGenVertexArrays(1, &mesh.VAO);
+        glGenBuffers(1, &mesh.VBO);
+        glGenBuffers(1, &mesh.IBO);
+        do_once = false;
+    }
+    
+   
     glBindVertexArray(mesh.VAO);
 
-    glGenBuffers(1, &mesh.VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
     /*  Copy vertex attributes to GPU */
     glBufferData(GL_ARRAY_BUFFER, 
                     mesh.numVertices * vertexSize, &mesh.vertexBuffer[0], 
                     GL_STATIC_DRAW);
 
-    glGenBuffers(1, &mesh.IBO);
+    
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.IBO);
     /*  Copy vertex indices to GPU */
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
@@ -214,18 +221,18 @@ void SetUp()
 
     //SetUpTextures();
 
-    for (int i = 0; i < NUM_MESHES; ++i)
-        SendVertexData(mesh[i]);
+    //for (int i = 0; i < NUM_MESHES; ++i)
+    //    SendVertexData(mesh[i]);
 
-    /*  Bind framebuffer to 0 to render to the screen (by default already 0) */
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ///*  Bind framebuffer to 0 to render to the screen (by default already 0) */
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    /*  Initially drawing using filled mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
-    /*  Hidden surface removal */
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    ///*  Initially drawing using filled mode */
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    //
+    ///*  Hidden surface removal */
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LEQUAL);
 
     glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
 
@@ -243,48 +250,48 @@ void SetUp()
 /******************************************************************************/
 void UpdateTransform(int partID)
 {
-    if (GLHelper::animated)
-    {
-        /*  Perform rotation if needed */
-        if (fabs(part[partID].rotAmount) > EPSILON)
-        {
-            if (partID == TORSO)
-            {
-                /*  torso will rotate 360degs, but we keep the angle between 0 and 360.
-                    For torso, rotAmount is rotation speed.
-                */
-                rotAngle = part[partID].rotAmount * secondsLapsed;
-                while (rotAngle > TWO_PI)
-                    rotAngle -= TWO_PI;
-            }
-            else
-            {
-                /*  Other parts, if rotated, maintain the angle between [-rotAmount, rotAmount].
-                    We simply use sine of [(secondLapsed MOD PI) * 4] to rotate in this range.
-                */
-                int isecs = static_cast<int>(secondsLapsed / PI);
-                float phase = 4.0f * (secondsLapsed - isecs * PI);
-                rotAngle = part[partID].rotAmount * std::sinf(phase);
-            }
+    //if (GLHelper::animated)
+    //{
+    //    /*  Perform rotation if needed */
+    //    if (fabs(part[partID].rotAmount) > EPSILON)
+    //    {
+    //        if (partID == TORSO)
+    //        {
+    //            /*  torso will rotate 360degs, but we keep the angle between 0 and 360.
+    //                For torso, rotAmount is rotation speed.
+    //            */
+    //            rotAngle = part[partID].rotAmount * secondsLapsed;
+    //            while (rotAngle > TWO_PI)
+    //                rotAngle -= TWO_PI;
+    //        }
+    //        else
+    //        {
+    //            /*  Other parts, if rotated, maintain the angle between [-rotAmount, rotAmount].
+    //                We simply use sine of [(secondLapsed MOD PI) * 4] to rotate in this range.
+    //            */
+    //            int isecs = static_cast<int>(secondsLapsed / PI);
+    //            float phase = 4.0f * (secondsLapsed - isecs * PI);
+    //            rotAngle = part[partID].rotAmount * std::sinf(phase);
+    //        }
 
-            rotationMat = Rotate(rotAngle, part[partID].rotAxis);
-        }
-        else
-            rotationMat = Mat4(1.0f);   /*  No rotation */
+    //        rotationMat = Rotate(rotAngle, part[partID].rotAxis);
+    //    }
+    //    else
+    //        rotationMat = Mat4(1.0f);   /*  No rotation */
 
 
-        /*  Torso will translate first, then rotate, to keep a distance from the world origin */
-        if (partID == TORSO)
-            transformMat[partID] = rotationMat * part[partID].tMat;
-        else
-        /*  Other parts will rotate, then be "shifted", in its parent's frame */
-            transformMat[partID] = transformMat[parent[partID]] * part[partID].tMat * rotationMat;
-    }
+    //    /*  Torso will translate first, then rotate, to keep a distance from the world origin */
+    //    if (partID == TORSO)
+    //        transformMat[partID] = rotationMat * part[partID].tMat;
+    //    else
+    //    /*  Other parts will rotate, then be "shifted", in its parent's frame */
+    //        transformMat[partID] = transformMat[parent[partID]] * part[partID].tMat * rotationMat;
+    //}
 
-    /*  Update the final MVP matrix for this part, 
-        counting its own separate self-transformation that does not affect its children.
-    */
-    partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
+    ///*  Update the final MVP matrix for this part, 
+    //    counting its own separate self-transformation that does not affect its children.
+    //*/
+    //partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
 }
 
 void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
@@ -309,8 +316,8 @@ void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 
     /*  Tell shader to use obj's VAO for rendering */
         
-    glBindVertexArray(mesh[obj.meshID].VAO);
-    glDrawElements(GL_TRIANGLES, mesh[obj.meshID].numIndices, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(terrain->VAO);
+    glDrawElements(GL_TRIANGLES, terrain->numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 
@@ -364,25 +371,38 @@ void Resize(int w, int h)
         Render function for update & drawing.
 */
 /******************************************************************************/
-void Render()
+void Render(double delta_time)
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
+  
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (GLHelper::animated)
-    {
-        tempTime = clock();
-        if (GLHelper::justAnimated)
-        {
-            idleTime += tempTime - currTime;
-            GLHelper::justAnimated = GL_FALSE;
-        }
+        //tempTime = clock();
+        //if (GLHelper::justAnimated)
+        //{
+        //    idleTime += tempTime - currTime;
+        //    GLHelper::justAnimated = GL_FALSE;
+        //}
 
-        currTime = tempTime;
+        terrain = new Mesh(CreateTerrain(16, 32, delta_time));
+        //currTime = tempTime;
         /*  We subtract idleTime as well, to keep the animation smooth after the pause */
-        secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
-    }
+        //secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
+    
+
+
+    for (int i = 0; i < NUM_MESHES; ++i)
+        SendVertexData(*terrain);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    /*  Initially drawing using filled mode */
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    /*  Hidden surface removal */
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     switch (static_cast<int>(GLHelper::currCameraMode))
     {
@@ -397,22 +417,25 @@ void Render()
     ComputeViewProjMats();
 
     /*  Send the floor data to shaders for rendering */
-    UpdateUniforms_Draw(wall, wallMVPMat);
+    //UpdateUniforms_Draw(wall, wallMVPMat);
+
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
     for (int i = 0; i < 1; ++i)
     {
-        if (GLHelper::animated || eyeMoved || resized)
+        if (GLHelper::animated || eyeMoved || resized) {}
             UpdateTransform(i);
 
         /*  Send each part's data to shaders for rendering */
-        UpdateUniforms_Draw(part[i], partMVPMat[i]);
+        //UpdateUniforms_Draw(part[i], partMVPMat[i]);
     }
 
     /*  Reset */
     eyeMoved = false;
     resized = false;
+
+    delete terrain;
 
     shdr_pgm.UnUse();
 }

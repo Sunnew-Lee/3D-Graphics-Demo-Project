@@ -56,6 +56,8 @@ const int EYE_RADIUS_STEP   = 1;
 void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
-void Render();
+void Render(double delta_time);
+inline Mesh* terrain;
+inline bool do_once = true;
 
 #endif

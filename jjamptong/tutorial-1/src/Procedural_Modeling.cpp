@@ -27,7 +27,7 @@ void P_Modeling::init() {
 
 void P_Modeling::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	Render();
+	//Render();
 
 	IG::update();
 }
