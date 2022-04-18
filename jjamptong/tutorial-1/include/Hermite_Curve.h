@@ -24,9 +24,11 @@ private:
 
 	GLSLShader shdr_pgm;
 	std::vector<glm::vec2> pos_vtx;
-	void calc_vert(glm::vec2 P0, glm::vec2 P1, int count);
+	void vert_update(glm::vec2 P0, glm::vec2 P1, int count);
+	void calc_vert(int count);
 	int curve_count = 2;
 	bool is_clicked = false;
 	static constexpr int VERT_NUM = 10;
+	int index{ 0 };
 	//IG* imgui;
 };
