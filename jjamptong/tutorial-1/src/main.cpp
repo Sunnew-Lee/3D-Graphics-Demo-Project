@@ -28,6 +28,7 @@ an OpenGL context and implement a game loop.
 //#include <Noise.h>
 #include <PerlinNoise.h>
 #include <Perlin_Terrain.h>
+#include <Hermite_Curve.h>
 
 static void draw();
 static void update();
@@ -39,7 +40,7 @@ static void cleanup();
 //ValueNoise valueNoise;
 PerlinNoise perlinNoise;
 Perlin_Terrain perlinTerrain;
-
+Hermite_Curve hermiteCurve;
 
 //**********************************************************************************************************//
 //Release ----> PerlinNoise
@@ -71,13 +72,15 @@ static void init() {
 	//valueNoise.makePPM();
 	//valueNoise.init();
 
-#ifdef _DEBUG
-	perlinTerrain.init();
-#else
-	
-	perlinNoise.makePPM();
-	perlinNoise.init();
-#endif
+//#ifdef _DEBUG
+//	perlinTerrain.init();
+//#else
+//	
+//	perlinNoise.makePPM();
+//	perlinNoise.init();
+//#endif
+
+	hermiteCurve.init();
 }
 
 static void update() {
@@ -96,12 +99,14 @@ static void update() {
 	//toon_fog.update(delta_time);
 	//valueNoise.update(delta_time);
 
-#ifdef _DEBUG
-	perlinTerrain.update(delta_time);
-	
-#else
-	perlinNoise.update(delta_time);
-#endif
+//#ifdef _DEBUG
+//	perlinTerrain.update(delta_time);
+//	
+//#else
+//	perlinNoise.update(delta_time);
+//#endif
+
+	hermiteCurve.update(delta_time);
 }
 
 static void draw() {
@@ -113,13 +118,15 @@ static void draw() {
 	//toon_fog.draw();
 	//valueNoise.draw();
 
-#ifdef _DEBUG
-	
-	perlinTerrain.draw();
-#else
-	perlinNoise.draw();
-#endif
-	
+//#ifdef _DEBUG
+//	
+//	perlinTerrain.draw();
+//#else
+//	perlinNoise.draw();
+//#endif
+
+	hermiteCurve.draw();
+
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
@@ -129,12 +136,14 @@ static void cleanup() {
 	//toon_fog.cleanup();
 	//valueNoise.cleanUp();
 
-#ifdef _DEBUG
-	perlinTerrain.cleanup();
-	
-#else
-	perlinNoise.cleanup();
-#endif
+//#ifdef _DEBUG
+//	perlinTerrain.cleanup();
+//	
+//#else
+//	perlinNoise.cleanup();
+//#endif
+
+	hermiteCurve.cleanup();
 
 	GLHelper::cleanup();
 }

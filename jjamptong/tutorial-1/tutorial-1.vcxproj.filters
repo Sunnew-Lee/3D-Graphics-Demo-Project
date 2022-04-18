@@ -57,10 +57,10 @@
     <ClInclude Include="include\PerlinNoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Header.h">
+    <ClInclude Include="include\Perlin_Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Perlin_Terrain.h">
+    <ClInclude Include="include\Hermite_Curve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -102,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Perlin_Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Hermite_Curve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

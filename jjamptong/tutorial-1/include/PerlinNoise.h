@@ -6,7 +6,6 @@
 #include <random>
 
 #include <glslshader.h>
-#include <Header.h>
 
 template<typename T>
 class Vec2
