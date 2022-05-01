@@ -1,8 +1,8 @@
-#include <Hermite_Curve.h>
+#include <CatmullRomSplines.h>
 #include <IG.h>
 #include <vector>
 
-void Hermite_Curve::init()
+void CatmullRomSplines::init()
 {
 	glViewport(0, 0, GLHelper::width, GLHelper::height);
 
@@ -11,7 +11,7 @@ void Hermite_Curve::init()
 	IG::init();
 }
 
-void Hermite_Curve::update(double delta_time)
+void CatmullRomSplines::update(double delta_time)
 {
 	IG::update();
 
@@ -26,7 +26,7 @@ void Hermite_Curve::update(double delta_time)
 				index = i;
 				break;
 			}
-			else if (abs(GLHelper::mouse_pos.x - pos_vtx[1+i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[1+i].y) < 0.05f)
+			else if (abs(GLHelper::mouse_pos.x - pos_vtx[1 + i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[1 + i].y) < 0.05f)
 			{
 				is_clicked = true;
 				index = i + 1;
@@ -51,41 +51,24 @@ void Hermite_Curve::update(double delta_time)
 		update_vao();
 	}
 
-	//if (ImGui::Button("New Line"))
-	//{
-	//	curve_count++;
-	//	glm::vec2 temp = *(pos_vtx.end() - 1);
-	//	calc_vert(*(pos_vtx.end() - 2), *(pos_vtx.end() - 1), VERT_NUM);
-	//	update_vao();
-	//}
+	
 }
 
-void Hermite_Curve::draw()
+void CatmullRomSplines::draw()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	shdr_pgm.Use();
 	glBindVertexArray(vaoid);
 
-	//for (int i{ 0 }; i < curve_count; i++)
-	//{
-	//	glLineWidth(3.f);
-	//	glVertexAttrib3f(9, 0.f, 0.f, 1.f); // blue color for lines
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i + 1, (VERT_NUM + 1));
-	//	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for vectors
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i, 2);	//pos_vtx[0],pos_vtx[1]
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i + (VERT_NUM + 1), 2);	//pos_vtx[11],pos_vtx[12]
-	//	glLineWidth(1.f);
-	//}
-
 	glLineWidth(3.f);
 
 	glVertexAttrib3f(9, 0.f, 0.f, 1.f); // blue color for lines
-	glDrawArrays(GL_LINE_STRIP, 1, (VERT_NUM + 1));
+	glDrawArrays(GL_LINE_STRIP, 1, (VERT_NUM - 1));
 
 	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for vectors
-	glDrawArrays(GL_LINE_STRIP, 0, 2);	//pos_vtx[0],pos_vtx[1]
-	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 1), 2);	//pos_vtx[11],pos_vtx[12]
+	glDrawArrays(GL_LINE_STRIP, 0, 2);	//first two node
+	glDrawArrays(GL_LINE_STRIP, (VERT_NUM - 1), 2);//last two node
 
 	glLineWidth(1.f);
 
@@ -101,12 +84,12 @@ void Hermite_Curve::draw()
 	IG::draw();
 }
 
-void Hermite_Curve::cleanup()
+void CatmullRomSplines::cleanup()
 {
 	IG::cleanup();
 }
 
-void Hermite_Curve::setup_shdrpgm()
+void CatmullRomSplines::setup_shdrpgm()
 {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
 	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
@@ -119,14 +102,12 @@ void Hermite_Curve::setup_shdrpgm()
 	}
 }
 
-void Hermite_Curve::setup_vao()
+void CatmullRomSplines::setup_vao()
 {
 	glm::vec2 P0 = glm::vec2(-0.5f, 0.0f);
-	glm::vec2 P1 = glm::vec2(0.5f, 0.0f);
-	glm::vec2 P0_p = glm::vec2(P0.x, -0.75f);
-	glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
-
-	pos_vtx.push_back(P0_p);
+	glm::vec2 P1 = glm::vec2(-0.25f, 0.25f);
+	glm::vec2 P2 = glm::vec2(0.25f, 0.25f);
+	glm::vec2 P3 = glm::vec2(0.5f, 0.0f);
 
 	for (int i{ 0 }; i <= VERT_NUM; i++)
 	{
@@ -135,12 +116,11 @@ void Hermite_Curve::setup_vao()
 		float u_square = u * u;
 
 		glm::vec2 temp =
-			(2 * u_cube - 3 * u_square + 1) * P0 + (-2 * u_cube + 3 * u_square) * P1
-			+ (u_cube - 2 * u_square + u) * (P0_p - P0) + (u_cube - u_square) * (P1_p - P1);
+			( -1.f/2.f * u_cube + u_square - 1.f/2.f * u) * P0 + (3.f/2.f * u_cube -5.f/2.f * u_square + 1.f) * P1
+			+ (-3.f/2.f * u_cube + 2.f * u_square + 1.f/2.f * u) * P2 + (1.f/2.f * u_cube - 1.f/2.f * u_square) *P3;
 
 		pos_vtx.push_back(temp);
 	}
-	pos_vtx.push_back(P1_p);
 
 	glCreateVertexArrays(1, &vaoid);
 	glGenBuffers(1, &vboid);
@@ -157,11 +137,8 @@ void Hermite_Curve::setup_vao()
 
 }
 
-void Hermite_Curve::update_vao()
+void CatmullRomSplines::update_vao()
 {
-	//glm::vec2 P0 = glm::vec2(-0.5f, 0.0f);
-	//glm::vec2 P1 = glm::vec2(0.5f, 0.0f);
-	//calc_vert(pos_vtx[1], pos_vtx[11], VERT_NUM);
 
 	glBindVertexArray(vaoid);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid);
@@ -174,34 +151,14 @@ void Hermite_Curve::update_vao()
 	glBindVertexArray(0);
 }
 
-void Hermite_Curve::vert_update(glm::vec2 P0, glm::vec2 P1, int count)
+//void CatmullRomSplines::vert_update(glm::vec2 P0, glm::vec2 P1, int count)
+//{
+//}
+//	
+
+void CatmullRomSplines::calc_vert(int count)
 {
-	//glm::vec2 temp = *(pos_vtx.end() - 2);
-	//glm::vec2 P1 = glm::vec2(temp.x + 0.25f, temp.y);
-	//glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
 
-	//pos_vtx.push_back(P0_p);
-
-	//for (int i{ 0 }; i <= count; i++)
-	//{
-	//	float u = (1.f / count * i);
-	//	float u_cube = u * u * u;
-	//	float u_square = u * u;
-
-	//	glm::vec2 temp =
-	//		(2 * u_cube - 3 * u_square + 1) * P0 + (-2 * u_cube + 3 * u_square) * P1
-	//		+ (u_cube - 2 * u_square + u) * (P0_p - P0) + (u_cube - u_square) * (P1_p - P1);
-
-	//	pos_vtx.push_back(temp);
-	//}
-	//pos_vtx.push_back(P1_p);
-}
-
-void Hermite_Curve::calc_vert( int count)
-{
-	//glm::vec2 temp = *(pos_vtx.end() - 2);
-	//glm::vec2 P1 = glm::vec2(temp.x + 0.25f, temp.y);
-	//glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
 
 	for (int i{ 0 }; i <= count; i++)
 	{
@@ -210,9 +167,9 @@ void Hermite_Curve::calc_vert( int count)
 		float u_square = u * u;
 
 		glm::vec2 temp =
-			(2 * u_cube - 3 * u_square + 1) * pos_vtx[1] + (-2 * u_cube + 3 * u_square) * pos_vtx[11]
-			+ (u_cube - 2 * u_square + u) * (pos_vtx[0] - pos_vtx[1]) + (u_cube - u_square) * (pos_vtx[12] - pos_vtx[11]);
+			(-1.f / 2.f * u_cube + u_square - 1.f / 2.f * u) * pos_vtx[0] + (3.f / 2.f * u_cube - 5.f / 2.f * u_square + 1.f) * pos_vtx[1]
+			+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * pos_vtx[2] + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * pos_vtx[3];
 
-		pos_vtx[i + 1] = temp;
+		//pos_vtx[i + 1] = temp;
 	}
 }

@@ -28,7 +28,7 @@ an OpenGL context and implement a game loop.
 //#include <Noise.h>
 #include <PerlinNoise.h>
 #include <Perlin_Terrain.h>
-#include <Hermite_Curve.h>
+#include <CatmullRomSplines.h>
 
 static void draw();
 static void update();
@@ -40,7 +40,7 @@ static void cleanup();
 //ValueNoise valueNoise;
 PerlinNoise perlinNoise;
 Perlin_Terrain perlinTerrain;
-Hermite_Curve hermiteCurve;
+CatmullRomSplines catmullRomSplines;
 
 //**********************************************************************************************************//
 //Release ----> PerlinNoise
@@ -66,21 +66,8 @@ static void init() {
 		std::exit(EXIT_FAILURE);
 	}
 
-	//GLApp::init();
-	//P_Model.init();
-	//toon_fog.init();
-	//valueNoise.makePPM();
-	//valueNoise.init();
 
-//#ifdef _DEBUG
-//	perlinTerrain.init();
-//#else
-//	
-//	perlinNoise.makePPM();
-//	perlinNoise.init();
-//#endif
-
-	hermiteCurve.init();
+	catmullRomSplines.init();
 }
 
 static void update() {
@@ -94,56 +81,22 @@ static void update() {
 	glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
 
 
-	//GLApp::update(delta_time);
-	//P_Model.update(delta_time);
-	//toon_fog.update(delta_time);
-	//valueNoise.update(delta_time);
-
-//#ifdef _DEBUG
-//	perlinTerrain.update(delta_time);
-//	
-//#else
-//	perlinNoise.update(delta_time);
-//#endif
-
-	hermiteCurve.update(delta_time);
+	catmullRomSplines.update(delta_time);
 }
 
 static void draw() {
 	ImGui::Render();
 
 
-	//GLApp::draw();
-	//P_Model.draw();
-	//toon_fog.draw();
-	//valueNoise.draw();
-
-//#ifdef _DEBUG
-//	
-//	perlinTerrain.draw();
-//#else
-//	perlinNoise.draw();
-//#endif
-
-	hermiteCurve.draw();
+	catmullRomSplines.draw();
 
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
-	//GLApp::cleanup();
-	//P_Model.cleanup();
-	//toon_fog.cleanup();
-	//valueNoise.cleanUp();
 
-//#ifdef _DEBUG
-//	perlinTerrain.cleanup();
-//	
-//#else
-//	perlinNoise.cleanup();
-//#endif
 
-	hermiteCurve.cleanup();
+	catmullRomSplines.cleanup();
 
 	GLHelper::cleanup();
 }
