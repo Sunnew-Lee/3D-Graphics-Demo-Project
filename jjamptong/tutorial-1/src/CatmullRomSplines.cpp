@@ -1,7 +1,7 @@
 #include <CatmullRomSplines.h>
 #include <IG.h>
 #include <vector>
-
+static int VERT_NUM = 4;
 void CatmullRomSplines::init() 
 {
 	P3Position = glm::vec2(0.5f, 0.0f);
@@ -16,19 +16,12 @@ void CatmullRomSplines::update(double delta_time)
 {
 	IG::update();
 
-	/*if (GLHelper::mouseClicked == true)
+	if (ImGui::SliderInt("addVertex", &VERT_NUM, 4, 12))
 	{
-
-		for (int i{ 0 }; i < curve_count; i++)
-		{
-			if (index >= 0 && index <= 13)
-			{
-				calc_vert(VERT_NUM);
-			}
-		}
-		calc_vert();
-		update_vao();
-	}*/
+		pos_vtx.clear();
+		setup_shdrpgm();
+		setup_vao();
+	}
 
 	if (GLHelper::mouseClicked == true)
 	{
@@ -91,7 +84,7 @@ void CatmullRomSplines::draw()
 	glPointSize(10.f);
 	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for points
 	glDrawArrays(GL_POINTS, 0, 1);
-	glDrawArrays(GL_POINTS, 11, 1);
+	glDrawArrays(GL_POINTS, VERT_NUM+1, 1);
 
 	glVertexAttrib3f(9, 1.f, 0.0f, 0.f); // red color for points
 	glDrawArrays(GL_POINTS, 1, pos_vtx.size()-2);
