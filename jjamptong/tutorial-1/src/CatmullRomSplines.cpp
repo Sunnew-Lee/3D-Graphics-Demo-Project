@@ -51,7 +51,7 @@ void CatmullRomSplines::update(double delta_time)
 		}
 		for (int i{ 0 }; i < curve_count; i++)
 		{
-			if (index <= 1 || index >= 10)
+			if (index <= 1 || index >= VERT_NUM)
 			{
 				//calc_vert(VERT_NUM);
 				pos_vtx[index] = GLHelper::mouse_pos;
