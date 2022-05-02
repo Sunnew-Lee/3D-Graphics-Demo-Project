@@ -30,6 +30,7 @@ GLboolean GLHelper::animated = GL_TRUE;
 GLboolean GLHelper::justAnimated = GL_FALSE;
 GLboolean GLHelper::mouseClicked = GL_FALSE;
 glm::vec2 GLHelper::mouse_pos = glm::vec2(0.0f, 0.0f);
+glm::vec2 GLHelper::world_mouse_pos = glm::vec2(0.0f, 0.0f);
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -310,6 +311,8 @@ void GLHelper::mousepos_cb(GLFWwindow *pwin, double xpos, double ypos) {
 #endif
     mouse_pos.x = static_cast<float>(xpos * 2) / width - 1.f;
     mouse_pos.y = static_cast<float>(ypos * -2) / height + 1.f;
+
+    world_mouse_pos = glm::vec2(xpos, ypos);
 }
 
 /*  _________________________________________________________________________*/

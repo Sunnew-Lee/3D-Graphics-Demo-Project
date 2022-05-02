@@ -61,6 +61,7 @@ struct GLHelper
   static GLboolean justAnimated;
   static GLboolean mouseClicked;
   static glm::vec2 mouse_pos;
+  static glm::vec2 world_mouse_pos;
 };
 
 #endif /* GLHELPER_H */

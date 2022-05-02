@@ -28,7 +28,7 @@ private:
 	void calc_vert();
 	int curve_count = 2;
 	bool is_clicked = false;
-	int VERT_NUM = 3;
+	int VERT_NUM = 10;
 	int index{ 0 };
 
 	glm::vec2 P3Position;
