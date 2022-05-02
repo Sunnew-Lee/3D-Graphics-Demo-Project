@@ -188,7 +188,7 @@ void CatmullRomSplines::calc_vert()
 	//VERT_NUM++;
 	//P3Position = { GLHelper::world_mouse_pos.x,GLHelper::world_mouse_pos.y };
 	glm::vec2 P1 = pos_vtx[1];
-	glm::vec2 P2 = pos_vtx[10];
+	glm::vec2 P2 = pos_vtx[VERT_NUM];
 	
 	for (int i{ 0 }; i <= VERT_NUM-1; i++)
 	{
@@ -198,7 +198,7 @@ void CatmullRomSplines::calc_vert()
 
 		glm::vec2 temp =
 			(-1.f / 2.f * u_cube + u_square - 1.f / 2.f * u) * pos_vtx[0] + (3.f / 2.f * u_cube - 5.f / 2.f * u_square + 1.f) * P1
-			+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * P2 + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * pos_vtx[11];
+			+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * P2 + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * pos_vtx[VERT_NUM+1];
 
 		pos_vtx[i + 1] = temp;
 	}
