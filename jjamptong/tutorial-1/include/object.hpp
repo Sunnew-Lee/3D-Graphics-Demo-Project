@@ -78,8 +78,8 @@ enum ImageID { BRICKS, FACE, JEANS, BALOONS, NUM_IMAGES };
 const Object base   
                 {
                     PLANE,
-                    Vec4(0.0f ,0.4f,0.0f, 1.0f),                               /*  Color */
-                    Translate(0.0f, -3.5f, -5.0f) * Rotate(PI/1.5, XAXIS)
+                    Vec4(0.0f ,0.2f,0.12f, 1.0f),                               /*  Color */
+                    Translate(0.0f, -3.5f, -5.0f) * Rotate(PI/1.5f, XAXIS)
                     * Scale(15.0f, 15.0f, 15.0f),                             /*  Self-transform */
                     Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
                     YAXIS,                                                      /*  Rotation w.r.t. parent */

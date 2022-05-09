@@ -74,7 +74,7 @@ const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint colorLoc, mvpMatLoc, modelLoc;
+GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc;
 
 GLSLShader shdr_pgm;
 
@@ -210,6 +210,7 @@ void SetUp()
     mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
     modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
+    sin_valLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "sin");
     
     ComputeViewProjMats();
 
@@ -399,6 +400,8 @@ void Render()
 
     /*  Send the floor data to shaders for rendering */
     //UpdateUniforms_Draw(wall, wallMVPMat);
+
+    //glUniform1f(sin_valLoc, glm::sin(static_cast<float>(clock())*0.5));
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
