@@ -35,17 +35,22 @@ void main(void)
     //EmitVert(1);
     //EmitTopVert(2);
 
-    gl_Position = gl_in[0].gl_Position;
-    gColor = vec4(0.0,0.4,0.0,0.1);
-    EmitVertex();
-
     gl_Position = gl_in[2].gl_Position;
     gColor = vec4(0.0,0.4,0.0,0.1);
     EmitVertex();
 
-    gl_Position = (gl_in[0].gl_Position + gl_in[2].gl_Position)/2;
-    gColor = vec4(1.0,1.0,1.0,1.0);
+    gl_Position = gl_in[0].gl_Position;
+    //gColor = vec4(0.0,0.4,0.0,0.1);
     EmitVertex();
+
+   
+
+    gl_Position = gl_in[1].gl_Position;
+    EmitVertex();
+
+    //gl_Position = (gl_in[0].gl_Position + gl_in[2].gl_Position)/2;
+    //gColor = vec4(1.0,1.0,1.0,1.0);
+    //EmitVertex();
 
     //gl_Position = gl_in[0].gl_Position;
     //gColor = vColor[i];

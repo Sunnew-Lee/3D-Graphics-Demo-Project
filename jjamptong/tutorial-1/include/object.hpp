@@ -100,7 +100,7 @@ const Object part[1]
                     //},
                     {
                         /*  HEAD        */
-                        SPHERE,
+                        PLANE,
                         Vec4(Head_color.x,Head_color.y,Head_color.z,Head_color.w),                         /*  Color */
                         Scale(10.f, 10.f, 10.f),                                /*  Self-transform */
                         Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
