@@ -109,8 +109,9 @@ void CompileShaders()
     //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
 
     //////////////////////////////////////////////////////////////////////////////////////// For Toon_Shading
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/toon.vert"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/toon.frag"));
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
+    shdr_files.push_back(std::make_pair(GL_GEOMETRY_SHADER, "../shaders/shader.geom"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -183,7 +184,7 @@ void ComputeViewProjMats()
     {
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
-        wallMVPMat = vpMat * wall.selfMat;
+        //wallMVPMat = vpMat * wall.selfMat;
     }
 }
 
@@ -397,18 +398,18 @@ void Render()
     ComputeViewProjMats();
 
     /*  Send the floor data to shaders for rendering */
-    UpdateUniforms_Draw(wall, wallMVPMat);
+    //UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
-    for (int i = 0; i < 1; ++i)
-    {
-        if (GLHelper::animated || eyeMoved || resized)
-            UpdateTransform(i);
+    //for (int i = 0; i < 1; ++i)
+    //{
+    //    if (GLHelper::animated || eyeMoved || resized)
+    //        UpdateTransform(i);
 
-        /*  Send each part's data to shaders for rendering */
-        UpdateUniforms_Draw(part[i], partMVPMat[i]);
-    }
+    //    /*  Send each part's data to shaders for rendering */
+    //    UpdateUniforms_Draw(part[i], partMVPMat[i]);
+    //}
 
     /*  Reset */
     eyeMoved = false;

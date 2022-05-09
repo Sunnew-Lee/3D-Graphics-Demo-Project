@@ -63,24 +63,24 @@ const PartID parent[NUM_PARTS]
 enum ImageID { BRICKS, FACE, JEANS, BALOONS, NUM_IMAGES };
 
 
-const Object wall
-{
-    PLANE,
-    Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
-    Translate(0.0f, 10.0f, -10.0f)* Rotate(PI, XAXIS)
-    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
-    Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
-    YAXIS,                                                      /*  Rotation w.r.t. parent */
-    0.0f
-    /*  Texture image ID */
-};
+//const Object wall
+//{
+//    PLANE,
+//    Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
+//    Translate(0.0f, 10.0f, -10.0f)* Rotate(PI, XAXIS)
+//    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+//    Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
+//    YAXIS,                                                      /*  Rotation w.r.t. parent */
+//    0.0f
+//    /*  Texture image ID */
+//};
 /*  The base on which the character is walking */
 const Object base   
                 {
                     PLANE,
-                    Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
-                    Translate(0.0f, -7.5f, 0.0f)* Rotate(PI/2., XAXIS)
-                    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+                    Vec4(0.0f ,0.4f,0.0f, 1.0f),                               /*  Color */
+                    Translate(0.0f, -3.5f, -5.0f) * Rotate(PI/1.5, XAXIS)
+                    * Scale(15.0f, 15.0f, 15.0f),                             /*  Self-transform */
                     Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
                     YAXIS,                                                      /*  Rotation w.r.t. parent */
                     0.0f
