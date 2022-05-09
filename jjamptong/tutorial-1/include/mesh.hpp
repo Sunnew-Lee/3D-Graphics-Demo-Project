@@ -98,7 +98,7 @@ Mesh CreateCone(int stacks, int slices);
 //enum MeshID { PLANE, CUBE, SPHERE, CYLINDER, CONE, PARTIAL_TORUS, TORUS, NUM_MESHES };
 enum MeshID { PLANE, NUM_MESHES };
 
-static Mesh mesh[NUM_MESHES] =  {   CreatePlane(10,10),
+static Mesh mesh[NUM_MESHES] =  {   CreatePlane(20,20),
                                     //CreateCube(1, 1),       /*  For torso, feet */
                                     //CreateSphere(16, 16),   /*  For head */
                                     //CreateCylinder(1, 8),   /*  For arms, legs */
