@@ -19,6 +19,7 @@
 #include <GLFW/glfw3.h>
 //#include "gl/freeglut.h"
 
+#include "glslshader.h"
 #include "mesh.hpp"
 #include "object.hpp"
 
@@ -57,7 +58,17 @@ void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
 void Render(double delta_time, float& frequency);
+void setUpGeometry(GLSLShader shdr);
+void RenderGeo(GLSLShader shd);
 inline Mesh* terrain;
 inline bool do_once = true;
+
+inline glm::mat4 geoMat{ 0 };
+inline GLint posMatLoc;
+inline GLint uShrinkLoc;
+inline GLint colorMatLoc;
+inline GLint viewMatLoc ;
+inline GLint ProjMatLoc ;
+inline GLint GeoMatLoc  ;
 
 #endif

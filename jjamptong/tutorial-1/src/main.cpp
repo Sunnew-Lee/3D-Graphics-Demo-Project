@@ -29,6 +29,7 @@ an OpenGL context and implement a game loop.
 #include <PerlinNoise.h>
 #include <Perlin_Terrain.h>
 #include <CatmullRomSplines.h>
+#include <Geometry.h>
 
 static void draw();
 static void update();
@@ -41,6 +42,7 @@ static void cleanup();
 PerlinNoise perlinNoise;
 Perlin_Terrain perlinTerrain;
 CatmullRomSplines catmullRomSplines;
+Geometry geo;
 
 //**********************************************************************************************************//
 //Release ----> PerlinNoise
@@ -66,8 +68,8 @@ static void init() {
 		std::exit(EXIT_FAILURE);
 	}
 
-
-	catmullRomSplines.init();
+	geo.init();
+	//catmullRomSplines.init();
 }
 
 static void update() {
@@ -80,23 +82,23 @@ static void update() {
 	sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
 	glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
 
-
-	catmullRomSplines.update(delta_time);
+	geo.update(delta_time);
+	//catmullRomSplines.update(delta_time);
 }
 
 static void draw() {
 	ImGui::Render();
 
-
-	catmullRomSplines.draw();
+	geo.draw();
+	//catmullRomSplines.draw();
 
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
 
-
-	catmullRomSplines.cleanup();
+	geo.cleanup();
+	//catmullRomSplines.cleanup();
 
 	GLHelper::cleanup();
 }

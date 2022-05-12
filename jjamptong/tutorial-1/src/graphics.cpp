@@ -19,7 +19,7 @@
 #include <glslshader.h>
 #include <glhelper.h>
 #include <input.hpp>
-
+#include <object.hpp>
 
 /*  Viewport width & height */
 int width = 1200;
@@ -41,7 +41,7 @@ int eyeBeta = NUM_STEPS_PI / 2;
 int eyeRadius = EYE_MAX_RADIUS / 2;
 bool eyeMoved = true;     /*  to trigger view matrix update */
 bool resized = true;     /*  to trigger projection matrix update */
-
+const GLfloat one = 1.0f;
 
 /*  For animating the objects */
 clock_t startTime;      /*  The starting time of the program */
@@ -134,24 +134,17 @@ void CompileShaders()
 /******************************************************************************/
 void SendVertexData(Mesh& mesh)
 {
-    if (do_once)
-    {
-        glGenVertexArrays(1, &mesh.VAO);
-        glGenBuffers(1, &mesh.VBO);
-        glGenBuffers(1, &mesh.IBO);
-        do_once = false;
-    }
-
-
+    glGenVertexArrays(1, &mesh.VAO);
     glBindVertexArray(mesh.VAO);
 
+    glGenBuffers(1, &mesh.VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
     /*  Copy vertex attributes to GPU */
     glBufferData(GL_ARRAY_BUFFER,
         mesh.numVertices * vertexSize, &mesh.vertexBuffer[0],
         GL_STATIC_DRAW);
 
-
+    glGenBuffers(1, &mesh.IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.IBO);
     /*  Copy vertex indices to GPU */
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -159,7 +152,7 @@ void SendVertexData(Mesh& mesh)
         GL_STATIC_DRAW);
 
     /*  Send vertex attributes to shaders */
-    for (int i = 0; i < numAttribs; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         glEnableVertexAttribArray(vLayout[i].location);
         glVertexAttribPointer(vLayout[i].location, vLayout[i].size, vLayout[i].type,
@@ -178,20 +171,20 @@ void SendVertexData(Mesh& mesh)
 void ComputeViewProjMats()
 {
     /*  Update view transform matrix */
-    if (eyeMoved)
+   // if (eyeMoved)
         viewMat = LookAtOrigin(1.0f * eyeRadius, ONE_STEP * eyeAlpha, ONE_STEP * eyeBeta);
 
     /*  Update projection matrix */
-    if (resized)
+    //if (resized)
         projMat = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
 
     /*  Update view/projection-related matrices for non-animating objects */
-    if (eyeMoved || resized)
-    {
+   // if (eyeMoved || resized)
+   // {
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
         wallMVPMat = vpMat * wall.selfMat;
-    }
+   // }
 }
 
 
@@ -385,7 +378,7 @@ void Render(double delta_time, float& frequency)
     //    GLHelper::justAnimated = GL_FALSE;
     //}
 
-    terrain = new Mesh(CreateTerrain(16, 32, delta_time, frequency));
+    //terrain = new Mesh(CreateTerrain(16, 32, delta_time, frequency));
     //currTime = tempTime;
     /*  We subtract idleTime as well, to keep the animation smooth after the pause */
     //secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
@@ -438,4 +431,65 @@ void Render(double delta_time, float& frequency)
     delete terrain;
 
     shdr_pgm.UnUse();
+}
+
+void setUpGeometry(GLSLShader shdr)
+{
+    shdr.Use();
+
+    /*  Obtain the locations of the variables in the shaders with the given names */
+    //posMatLoc = glGetUniformLocation(shdr.GetHandle(), "pos");
+	colorMatLoc = glGetUniformLocation(shdr.GetHandle(), "normal");
+    uShrinkLoc = glGetUniformLocation(shdr.GetHandle(), "uShrink");
+     //viewMatLoc = glGetUniformLocation(shdr.GetHandle(), "View");
+     //ProjMatLoc = glGetUniformLocation(shdr.GetHandle(), "Projection");
+    mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
+    // GeoMatLoc = glGetUniformLocation(shdr.GetHandle(), "GeometryTransform");
+   // viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+    //projMat = glm::perspective(glm::radians(45.0f),
+    //    (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f);
+    geoMat = { {1,0,0,0},
+                    {0,1,0,0},
+                    {0,0,1,0},
+                    {0,0,0,1} };
+
+    //glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, glm::value_ptr(viewMat));
+   // glUniformMatrix4fv(ProjMatLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+   // glUniformMatrix4fv(GeoMatLoc, 1, GL_FALSE, glm::value_ptr(geoMat));
+
+    ComputeViewProjMats();
+
+    SendVertexData(mesh[2]);
+
+    /*  Bind framebuffer to 0 to render to the screen (by default already 0) */
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    /*  Initially drawing using filled mode */
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
+
+    shdr.UnUse();
+}
+
+
+void RenderGeo(GLSLShader shd)
+{
+    shd.Use();
+    //glClearBufferfv(GL_COLOR, 0, bgColor);
+    glClearBufferfv(GL_DEPTH, 0, &one);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUniform3fv(colorMatLoc, 1, ValuePtr(glm::vec3{ 0.3f,0.9f,0.7f }));
+    glUniform1f(uShrinkLoc, 0.5);
+   //glUniform3fv(posMatLoc, 1, ValuePtr(glm::vec3{ 0.3f,0.9f,0.7f }));
+    //glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, glm::value_ptr(viewMat));
+   //glUniformMatrix4fv(ProjMatLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+    glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(vpMat));
+    //glUniformMatrix4fv(GeoMatLoc, 1, GL_FALSE, glm::value_ptr(geoMat));
+
+    glBindVertexArray(mesh[SPHERE].VAO);
+    glDrawElements(GL_TRIANGLES, mesh[SPHERE].numIndices, GL_UNSIGNED_INT, nullptr);
+
+    shd.UnUse();
 }
