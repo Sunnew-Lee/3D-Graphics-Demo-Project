@@ -207,33 +207,33 @@ Mesh CreateCylinder(int stacks, int slices)
 
         for (int j = 0; j <= slices; j++)
         {
-            float col = static_cast<float>(j) / slices;
-            float alpha = col * 2.0f * PI;
-            float sinAlpha = sin(alpha);
-            float cosAlpha = cos(alpha);
+          	float col = static_cast<float>(j) / slices;
+			float alpha = col * 2.0f * PI;
+			float sinAlpha = sin(alpha);
+			float cosAlpha = cos(alpha);
 
-            vertex.uv.x = row;
-            vertex.uv.y = col;
+			vertex.uv.x = row;
+			vertex.uv.y = col;
 
-            vertex.pos.x = 0.5f * sinAlpha;
-            vertex.pos.y = row - 0.5f;
-            vertex.pos.z = 0.5f * cosAlpha;
+			vertex.pos.x = 0.5f * sinAlpha;
+			vertex.pos.y = row - 0.5f;
+			vertex.pos.z = 0.5f * cosAlpha;
 
-            vertex.nrm.x = vertex.pos.x / 0.5f;
-            vertex.nrm.y = 0.f;
-            vertex.nrm.z = vertex.pos.z / 0.5f;
+			vertex.nrm.x = vertex.pos.x / 0.5f;
+			vertex.nrm.y = 0.f;
+			vertex.nrm.z = vertex.pos.z / 0.5f;
 
-            addVertex(mesh, vertex);
-        }
+			addVertex(mesh, vertex);
+		}
     }
     BuildIndexBuffer(stacks, slices, mesh);
 
     int vertex_size = static_cast<int>(mesh.vertexBuffer.size());
 
-    /// For the caps
+	/// For the caps
 
-    for (int i = 0; i <= stacks; i++)
-    {
+	for (int i = 0; i <= stacks; i++)
+	{
         if (i == 0)
         {
             vertex.pos = Vec3(0.0, 0.5, 0.0);
@@ -249,16 +249,16 @@ Mesh CreateCylinder(int stacks, int slices)
             vertex.nrm.z = vertex.pos.z / 0.5f;
         }
 
-        addVertex(mesh, vertex);
+		addVertex(mesh, vertex);
 
-        float row = static_cast<float>(i) / stacks;
+		float row = static_cast<float>(i) / stacks;
 
-        for (int j = 0; j <= slices; j++)
+		for (int j = 0; j <= slices; j++)
         {
-            float col = static_cast<float>(j) / slices;
-            float alpha = col * 2.0f * PI;
-            float sinAlpha = sin(alpha);
-            float cosAlpha = cos(alpha);
+			float col = static_cast<float>(j) / slices;
+			float alpha = col * 2.0f * PI;
+			float sinAlpha = sin(alpha);
+			float cosAlpha = cos(alpha);
 
             vertex.uv.x = row;
             vertex.uv.y = col;
@@ -280,9 +280,9 @@ Mesh CreateCylinder(int stacks, int slices)
                 vertex.nrm.z = vertex.pos.z / 0.5f;
             }
 
-            addVertex(mesh, vertex);
-        }
-    }
+			addVertex(mesh, vertex);
+		}
+	}
 
     for (int i = 0; i <= stacks; i++)
     {
@@ -298,7 +298,7 @@ Mesh CreateCylinder(int stacks, int slices)
         addIndex(mesh, vertex_size + slices);
         addIndex(mesh, vertex_size + 1);
     }
-
+    
     return mesh;
 }
 
@@ -410,48 +410,48 @@ Mesh CreateCone(int stacks, int slices)
     }
     BuildIndexBuffer(stacks, slices, mesh);
 
-    int vertex_size = static_cast<int>(mesh.vertexBuffer.size());
+	int vertex_size = static_cast<int>(mesh.vertexBuffer.size());
 
-    vertex.pos = Vec3(0.0, -0.5, 0.0);
-    vertex.nrm = Vec3(0.0, -1.0, 0.0);
+	vertex.pos = Vec3(0.0, -0.5, 0.0);
+	vertex.nrm = Vec3(0.0, -1.0, 0.0);
 
-    addVertex(mesh, vertex);
-
-
-    for (int j = 0; j <= slices; j++)
-    {
-        float col = static_cast<float>(j) / slices;
-        float alpha = col * 2.0f * PI;
-        float sinAlpha = sin(alpha);
-        float cosAlpha = cos(alpha);
-
-        vertex.uv.x = 0.;
-        vertex.uv.y = col;
-
-        vertex.pos = Vec3(0.5 * sinAlpha, -0.5, 0.5 * cosAlpha);
-
-        vertex.nrm.x = 0.0;
-        vertex.nrm.y = -1.0;
-        vertex.nrm.z = 0.0;
-
-        addVertex(mesh, vertex);
-    }
+	addVertex(mesh, vertex);
 
 
+	for (int j = 0; j <= slices; j++)
+	{
+		float col = static_cast<float>(j) / slices;
+		float alpha = col * 2.0f * PI;
+		float sinAlpha = sin(alpha);
+		float cosAlpha = cos(alpha);
 
-    for (int j = 1; j < slices; j++)
-    {
-        addIndex(mesh, vertex_size);
-        addIndex(mesh, vertex_size + j);
-        addIndex(mesh, vertex_size + j + 1);
-    }
+		vertex.uv.x = 0.;
+		vertex.uv.y = col;
 
-    addIndex(mesh, vertex_size);
-    addIndex(mesh, vertex_size + slices);
-    addIndex(mesh, vertex_size + 1);
+		vertex.pos = Vec3(0.5 * sinAlpha, -0.5, 0.5 * cosAlpha);
+
+		vertex.nrm.x = 0.0;
+		vertex.nrm.y = -1.0;
+		vertex.nrm.z = 0.0;
+
+		addVertex(mesh, vertex);
+	}
 
 
-    return mesh;
+
+	for (int j = 1; j < slices; j++)
+	{
+		addIndex(mesh, vertex_size);
+		addIndex(mesh, vertex_size + j);
+		addIndex(mesh, vertex_size + j + 1);
+	}
+
+	addIndex(mesh, vertex_size);
+	addIndex(mesh, vertex_size + slices);
+	addIndex(mesh, vertex_size + 1);
+
+
+	return mesh;
 }
 
 
@@ -495,7 +495,7 @@ void BuildIndexBuffer(int stacks, int slices, Mesh& mesh)
                 addIndex(mesh, p1);
                 addIndex(mesh, p2);
             }
-
+            
             /*  You need to compute the indices for the second triangle here */
             /*  ... */
             p3 = p2;

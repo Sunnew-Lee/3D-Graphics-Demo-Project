@@ -19,7 +19,6 @@
 #include <GLFW/glfw3.h>
 //#include "gl/freeglut.h"
 
-#include "glslshader.h"
 #include "mesh.hpp"
 #include "object.hpp"
 
@@ -44,31 +43,19 @@ extern int eyeAlpha, eyeBeta;
 extern int eyeRadius;
 extern bool eyeMoved;
 /*  Limit for camera angle */
-const int EYE_MAX_ALPHA = NUM_STEPS_PI / 2 - 1;
-const int EYE_MIN_ALPHA = -EYE_MAX_ALPHA + 1;
-const int EYE_ANGLE_STEP = 1;
+const int EYE_MAX_ALPHA     = NUM_STEPS_PI / 2 - 1;
+const int EYE_MIN_ALPHA     = -EYE_MAX_ALPHA + 1;
+const int EYE_ANGLE_STEP    = 1;
 /*  Limit for camera distance from the origin */
-const int EYE_MAX_RADIUS = 30;
-const int EYE_MIN_RADIUS = 1;
-const int EYE_RADIUS_STEP = 1;
+const int EYE_MAX_RADIUS    = 40;
+const int EYE_MIN_RADIUS    = 15;
+const int EYE_RADIUS_STEP   = 1;
 
 
 /*  Public functions */
 void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
-void Render(double delta_time, float& frequency);
-void setUpGeometry(GLSLShader shdr);
-void RenderGeo(GLSLShader shd);
-inline Mesh* terrain;
-inline bool do_once = true;
-
-inline glm::mat4 geoMat{ 0 };
-inline GLint posMatLoc;
-inline GLint uShrinkLoc;
-inline GLint colorMatLoc;
-inline GLint viewMatLoc ;
-inline GLint ProjMatLoc ;
-inline GLint GeoMatLoc  ;
+void Render();
 
 #endif

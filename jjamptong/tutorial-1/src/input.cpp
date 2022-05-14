@@ -1,6 +1,25 @@
-#include "input.hpp"
-#include <graphics.hpp>
+/******************************************************************************/
+/*!
+\file   input.cpp
+\par    Purpose: Handle events upon user inputs
+\par    Language: C++
+\par    Platform: Visual Studio 2013, Windows 7 64-bit
+\author Sang Le
+\par    Email: sang.le\@digipen.edu
+\par    DigiPen login: sang.le
+\date   8/1/2015
+*/
+/******************************************************************************/
 
+#include "input.hpp"
+
+/******************************************************************************/
+/*!
+\fn     void MoveUp()
+\brief
+        Handle event when user press w/W
+*/
+/******************************************************************************/
 void MoveUp()
 {
     /*  Move camera up */
@@ -12,6 +31,14 @@ void MoveUp()
     }
 }
 
+
+/******************************************************************************/
+/*!
+\fn     void MoveDown()
+\brief
+        Handle event when user press s/S
+*/
+/******************************************************************************/
 void MoveDown()
 {
     /*  Move camera down */
@@ -23,6 +50,14 @@ void MoveDown()
     }
 }
 
+
+/******************************************************************************/
+/*!
+\fn     void MoveLeft()
+\brief
+        Handle event when user press a/A
+*/
+/******************************************************************************/
 void MoveLeft()
 {
     /*  Move camera left */
@@ -36,6 +71,14 @@ void MoveLeft()
     //glutPostRedisplay();    /*  Set flag to force re-rendering */
 }
 
+
+/******************************************************************************/
+/*!
+\fn     void MoveRight()
+\brief
+        Handle event when user press d/D
+*/
+/******************************************************************************/
 void MoveRight()
 {
     /*  Move camera right */
@@ -49,6 +92,14 @@ void MoveRight()
     //glutPostRedisplay();    /*  Set flag to force re-rendering */
 }
 
+
+/******************************************************************************/
+/*!
+\fn     void MoveCloser()
+\brief
+        Handle event when user press UP or scroll mouse wheel down
+*/
+/******************************************************************************/
 void MoveCloser()
 {
     /*  Move camera closer to origin */
@@ -60,6 +111,14 @@ void MoveCloser()
     }
 }
 
+
+/******************************************************************************/
+/*!
+\fn     void MoveFarther()
+\brief
+        Handle event when user press DOWN or scroll mouse wheel up
+*/
+/******************************************************************************/
 void MoveFarther()
 {
     /*  Move camera farther from origin */

@@ -20,8 +20,6 @@ objects participating in the application.
 ----------------------------------------------------------------------------- */
 #include <GL/glew.h> // for access to OpenGL API declarations 
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -59,9 +57,6 @@ struct GLHelper
   static CameraMode currCameraMode;
   static GLboolean animated;
   static GLboolean justAnimated;
-  static GLboolean mouseClicked;
-  static glm::vec2 mouse_pos;
-  static glm::vec2 world_mouse_pos;
 };
 
 #endif /* GLHELPER_H */

@@ -19,29 +19,29 @@
 #include <glslshader.h>
 #include <glhelper.h>
 #include <input.hpp>
-#include <object.hpp>
+
 
 /*  Viewport width & height */
-int width = 1200;
-int height = 675;
+int width   = 1200;
+int height  = 675;
 
 /*  Camera view volume planes */
-float nearPlane = 1.0f;
-float farPlane = 1000.0f;
-float topPlane = 0.6f * nearPlane;
-float bottomPlane = -topPlane;
-float aspect = 1.0f * width / height;
-float rightPlane = topPlane * aspect;
-float leftPlane = -rightPlane;
+float nearPlane     = 1.0f;
+float farPlane      = 80.0f;
+float topPlane      = 0.6f * nearPlane;
+float bottomPlane   = -topPlane;
+float aspect        = 1.0f * width / height;
+float rightPlane    = topPlane * aspect;
+float leftPlane     = -rightPlane;
 
 
 /*  For moving the camera */
-int eyeAlpha = 1;
-int eyeBeta = NUM_STEPS_PI / 2;
-int eyeRadius = EYE_MAX_RADIUS / 2;
-bool eyeMoved = true;     /*  to trigger view matrix update */
-bool resized = true;     /*  to trigger projection matrix update */
-const GLfloat one = 1.0f;
+int eyeAlpha    = 1;
+int eyeBeta     = NUM_STEPS_PI / 2;
+int eyeRadius   = EYE_MAX_RADIUS;
+bool eyeMoved   = true;     /*  to trigger view matrix update */
+bool resized    = true;     /*  to trigger projection matrix update */
+
 
 /*  For animating the objects */
 clock_t startTime;      /*  The starting time of the program */
@@ -61,10 +61,18 @@ Mat4 baseMVPMat, wallMVPMat, partMVPMat[NUM_PARTS];
 Mat4 viewMat, projMat, vpMat;
 
 
+/*  Color/depth of background */
+const GLfloat bgColor[] = { 0.0f, 0.6f, 0.0f, 1.0f };
+const GLfloat one = 1.0f;
 
-const Vec4 useNormal = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
+/*  Non-color vectors, used to trigger texture and normal usage */
+const Vec4 useTexture   = Vec4(-1.0f, -1.0f, -1.0f, -1.0f);
+const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 
-
+/*  For texture loading/generation */
+GLuint textures[NUM_IMAGES];
+const char *imgFileName[NUM_IMAGES] 
+{ "images/bricks.png", "images/face.png", "images/jeans.png", "images/baloons.png" };
 
 
 /*  Shader filenames */
@@ -74,12 +82,12 @@ const Vec4 useNormal = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint colorLoc, mvpMatLoc, modelLoc;
+GLint textureLoc, colorLoc, mvpMatLoc;
 
 GLSLShader shdr_pgm;
 
 
-void ValidateShader(GLuint shader, const char* file)
+void ValidateShader(GLuint shader, const char *file)
 {
     const unsigned int BUFFER_SIZE = 512;
     char buffer[BUFFER_SIZE];
@@ -100,15 +108,44 @@ void ValidateShader(GLuint shader, const char* file)
 }
 
 
+void ValidateProgram(GLuint program)
+{
+    const unsigned int BUFFER_SIZE = 512;
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+    GLsizei length = 0;
+    GLint status;
+
+    /*  Ask OpenGL to give us the log associated with the program */
+    glGetProgramInfoLog(program, BUFFER_SIZE, &length, buffer); 
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+
+    if (status != GL_TRUE && length > 0)
+    {
+        std::cerr << "Program " << program << " link error: " << buffer << "\n";
+        exit(1);
+    }
+    else
+        std::cout << "Program " << program << " link successful.\n";
+
+    /*  Ask OpenGL to validate the program */
+    glValidateProgram(program);
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &status);
+    if (status == GL_FALSE)
+    {
+        std::cerr << "Error validating shader " << program << ".\n";
+        exit(1);
+    }
+    else
+    {
+        std::cout << "Program " << program << " validation successful.\n";
+    }
+}
+
+
 void CompileShaders()
 {
     std::vector<std::pair<GLenum, std::string>> shdr_files;
-
-    //////////////////////////////////////////////////////////////////////////////////////// For P_Modeling
-    //shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
-    //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
-
-    //////////////////////////////////////////////////////////////////////////////////////// For Toon_Shading
     shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
     shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
@@ -119,20 +156,7 @@ void CompileShaders()
     }
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void SendVertexData(Mesh &mesh)
-\brief
-        Create VAO (graphics state), VBO (vertex attribute state) and
-        IBO (vertex index state) for the mesh, and feed vertex data into
-        the shaders.
-\param  mesh
-        The input mesh, whose VAO/VBO/IBO members will be updated and data
-        will be sent to shaders.
-*/
-/******************************************************************************/
-void SendVertexData(Mesh& mesh)
+void SendVertexData(Mesh &mesh)
 {
     glGenVertexArrays(1, &mesh.VAO);
     glBindVertexArray(mesh.VAO);
@@ -140,64 +164,41 @@ void SendVertexData(Mesh& mesh)
     glGenBuffers(1, &mesh.VBO);
     glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
     /*  Copy vertex attributes to GPU */
-    glBufferData(GL_ARRAY_BUFFER,
-        mesh.numVertices * vertexSize, &mesh.vertexBuffer[0],
-        GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 
+                    mesh.numVertices * vertexSize, &mesh.vertexBuffer[0], 
+                    GL_STATIC_DRAW);
 
     glGenBuffers(1, &mesh.IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.IBO);
     /*  Copy vertex indices to GPU */
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-        mesh.numIndices * indexSize, &mesh.indexBuffer[0],
-        GL_STATIC_DRAW);
-
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 
+                    mesh.numIndices * indexSize, &mesh.indexBuffer[0], 
+                    GL_STATIC_DRAW);
+     
     /*  Send vertex attributes to shaders */
     for (int i = 0; i < 1; ++i)
     {
         glEnableVertexAttribArray(vLayout[i].location);
-        glVertexAttribPointer(vLayout[i].location, vLayout[i].size, vLayout[i].type,
-            vLayout[i].normalized, vertexSize, (void*)static_cast<__int64>(vLayout[i].offset));
+        glVertexAttribPointer(vLayout[i].location, vLayout[i].size, vLayout[i].type, 
+                                vLayout[i].normalized, vertexSize, (void*)static_cast<__int64>(vLayout[i].offset));
     }
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void ComputeViewProjMats()
-\brief
-        Set up the camera positions, orientations and view frustums.
-*/
-/******************************************************************************/
 void ComputeViewProjMats()
 {
     /*  Update view transform matrix */
-   // if (eyeMoved)
         viewMat = LookAtOrigin(1.0f * eyeRadius, ONE_STEP * eyeAlpha, ONE_STEP * eyeBeta);
 
     /*  Update projection matrix */
-    //if (resized)
         projMat = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
-
-    /*  Update view/projection-related matrices for non-animating objects */
-   // if (eyeMoved || resized)
-   // {
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
         wallMVPMat = vpMat * wall.selfMat;
-   // }
+
 }
 
 
 
-
-
-/******************************************************************************/
-/*!
-\fn     void SetUp()
-\brief
-        Set up the render program and graphics-related data for rendering.
-*/
-/******************************************************************************/
 void SetUp()
 {
     /*  Starting time */
@@ -207,117 +208,33 @@ void SetUp()
 
     /*  Obtain the locations of the variables in the shaders with the given names */
     mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
-    modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
+   // textureLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "tex");
 
     ComputeViewProjMats();
 
-    //SetUpTextures();
+	SendVertexData(mesh[0]);
 
-    //for (int i = 0; i < NUM_MESHES; ++i)
-    //    SendVertexData(mesh[i]);
+    /*  Bind framebuffer to 0 to render to the screen (by default already 0) */
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    ///*  Bind framebuffer to 0 to render to the screen (by default already 0) */
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    ///*  Initially drawing using filled mode */
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //
-    ///*  Hidden surface removal */
-    //glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_LEQUAL);
+    /*  Initially drawing using filled mode */
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    
+    /*  Hidden surface removal */
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
 
     shdr_pgm.UnUse();
 }
 
-/******************************************************************************/
-/*!
-\fn     void UpdateTransform(int partID)
-\brief
-        Update transformation/MVP matrices for part[partID]
-\param  partID
-        ID of the part we want to update
-*/
-/******************************************************************************/
-void UpdateTransform(int partID)
-{
-    //if (GLHelper::animated)
-    //{
-    //    /*  Perform rotation if needed */
-    //    if (fabs(part[partID].rotAmount) > EPSILON)
-    //    {
-    //        if (partID == TORSO)
-    //        {
-    //            /*  torso will rotate 360degs, but we keep the angle between 0 and 360.
-    //                For torso, rotAmount is rotation speed.
-    //            */
-    //            rotAngle = part[partID].rotAmount * secondsLapsed;
-    //            while (rotAngle > TWO_PI)
-    //                rotAngle -= TWO_PI;
-    //        }
-    //        else
-    //        {
-    //            /*  Other parts, if rotated, maintain the angle between [-rotAmount, rotAmount].
-    //                We simply use sine of [(secondLapsed MOD PI) * 4] to rotate in this range.
-    //            */
-    //            int isecs = static_cast<int>(secondsLapsed / PI);
-    //            float phase = 4.0f * (secondsLapsed - isecs * PI);
-    //            rotAngle = part[partID].rotAmount * std::sinf(phase);
-    //        }
-
-    //        rotationMat = Rotate(rotAngle, part[partID].rotAxis);
-    //    }
-    //    else
-    //        rotationMat = Mat4(1.0f);   /*  No rotation */
-
-
-    //    /*  Torso will translate first, then rotate, to keep a distance from the world origin */
-    //    if (partID == TORSO)
-    //        transformMat[partID] = rotationMat * part[partID].tMat;
-    //    else
-    //    /*  Other parts will rotate, then be "shifted", in its parent's frame */
-    //        transformMat[partID] = transformMat[parent[partID]] * part[partID].tMat * rotationMat;
-    //}
-
-    ///*  Update the final MVP matrix for this part, 
-    //    counting its own separate self-transformation that does not affect its children.
-    //*/
-    //partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
-}
-
-void UpdateUniforms_Draw(const Object& obj, const Mat4& MVPMat)
-{
-
-    glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
-
-    /*  Trigger shader to use normal for color */
-
-/*if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
-    glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); */
-    /*  Use obj's color if drawing wireframes or objs that don't have textures */
-//else
-//{
-//    glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
-//	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
-//}
-/*  Send MVP matrix to shaders */
-    glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(MVPMat));
-
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, ValuePtr(obj.selfMat));
-
-    /*  Tell shader to use obj's VAO for rendering */
-
-    glBindVertexArray(terrain->VAO);
-    glDrawElements(GL_TRIANGLES, terrain->numIndices, GL_UNSIGNED_INT, nullptr);
-}
-
 
 void CleanUp()
 {
     glBindVertexArray(0);
-
+    
     for (int i = 0; i < NUM_MESHES; ++i)
     {
         glDeleteVertexArrays(1, &mesh[i].VAO);
@@ -356,140 +273,22 @@ void Resize(int w, int h)
     //glutPostRedisplay();    /*  Set flag to force re-rendering */
 }
 
-
-/******************************************************************************/
-/*!
-\fn     void Render()
-\brief
-        Render function for update & drawing.
-*/
-/******************************************************************************/
-void Render(double delta_time, float& frequency)
+void Render()
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //tempTime = clock();
-    //if (GLHelper::justAnimated)
-    //{
-    //    idleTime += tempTime - currTime;
-    //    GLHelper::justAnimated = GL_FALSE;
-    //}
-
-    //terrain = new Mesh(CreateTerrain(16, 32, delta_time, frequency));
-    //currTime = tempTime;
-    /*  We subtract idleTime as well, to keep the animation smooth after the pause */
-    //secondsLapsed = 1.0f * (currTime - startTime - idleTime) / CLOCKS_PER_SEC;
-
-
-
-    for (int i = 0; i < NUM_MESHES; ++i)
-        SendVertexData(*terrain);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    /*  Initially drawing using filled mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    /*  Hidden surface removal */
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
-
-    switch (static_cast<int>(GLHelper::currCameraMode))
-    {
-    case GLHelper::UP: MoveUp(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    case GLHelper::DOWN:MoveDown(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    case GLHelper::LEFT:MoveLeft(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    case GLHelper::RIGHT:MoveRight(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    case GLHelper::CLOSER:MoveCloser(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    case GLHelper::FARTHER:MoveFarther(); GLHelper::currCameraMode = GLHelper::IDLE; break;
-    }
-
-    ComputeViewProjMats();
-
-    /*  Send the floor data to shaders for rendering */
-    //UpdateUniforms_Draw(wall, wallMVPMat);
-
-    UpdateUniforms_Draw(base, baseMVPMat);
-
-
-    for (int i = 0; i < 1; ++i)
-    {
-        if (GLHelper::animated || eyeMoved || resized) {}
-        UpdateTransform(i);
-
-        /*  Send each part's data to shaders for rendering */
-        //UpdateUniforms_Draw(part[i], partMVPMat[i]);
-    }
-
-    /*  Reset */
-    eyeMoved = false;
-    resized = false;
-
-    delete terrain;
-
-    shdr_pgm.UnUse();
-}
-
-void setUpGeometry(GLSLShader shdr)
-{
-    shdr.Use();
-
-    /*  Obtain the locations of the variables in the shaders with the given names */
-    //posMatLoc = glGetUniformLocation(shdr.GetHandle(), "pos");
-	colorMatLoc = glGetUniformLocation(shdr.GetHandle(), "normal");
-    uShrinkLoc = glGetUniformLocation(shdr.GetHandle(), "uShrink");
-     //viewMatLoc = glGetUniformLocation(shdr.GetHandle(), "View");
-     //ProjMatLoc = glGetUniformLocation(shdr.GetHandle(), "Projection");
-    mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
-    // GeoMatLoc = glGetUniformLocation(shdr.GetHandle(), "GeometryTransform");
-   // viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
-    //projMat = glm::perspective(glm::radians(45.0f),
-    //    (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f);
-    geoMat = { {1,0,0,0},
-                    {0,1,0,0},
-                    {0,0,1,0},
-                    {0,0,0,1} };
-
-    //glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, glm::value_ptr(viewMat));
-   // glUniformMatrix4fv(ProjMatLoc, 1, GL_FALSE, glm::value_ptr(projMat));
-   // glUniformMatrix4fv(GeoMatLoc, 1, GL_FALSE, glm::value_ptr(geoMat));
-
-    ComputeViewProjMats();
-
-    SendVertexData(mesh[2]);
-
-    /*  Bind framebuffer to 0 to render to the screen (by default already 0) */
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    /*  Initially drawing using filled mode */
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
-
-    shdr.UnUse();
-}
-
-
-void RenderGeo(GLSLShader shd)
-{
-    shd.Use();
     //glClearBufferfv(GL_COLOR, 0, bgColor);
     glClearBufferfv(GL_DEPTH, 0, &one);
-    glClear(GL_COLOR_BUFFER_BIT);
+  
 
-    glUniform3fv(colorMatLoc, 1, ValuePtr(glm::vec3{ 0.3f,0.9f,0.7f }));
-    glUniform1f(uShrinkLoc, 0.5);
-   //glUniform3fv(posMatLoc, 1, ValuePtr(glm::vec3{ 0.3f,0.9f,0.7f }));
-    //glUniformMatrix4fv(viewMatLoc, 1, GL_FALSE, glm::value_ptr(viewMat));
-   //glUniformMatrix4fv(ProjMatLoc, 1, GL_FALSE, glm::value_ptr(projMat));
-    glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(vpMat));
-    //glUniformMatrix4fv(GeoMatLoc, 1, GL_FALSE, glm::value_ptr(geoMat));
+    glUniform4fv(colorLoc, 1, ValuePtr(useNormal));
 
-    glBindVertexArray(mesh[SPHERE].VAO);
-    glDrawElements(GL_TRIANGLES, mesh[SPHERE].numIndices, GL_UNSIGNED_INT, nullptr);
+    glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(vpMat * part->selfMat));
 
-    shd.UnUse();
+    glBindVertexArray(mesh[part->meshID].VAO);
+    glDrawElements(GL_TRIANGLES, mesh[part->meshID].numIndices, GL_UNSIGNED_INT, nullptr);
+  
+
+    shdr_pgm.UnUse();
 }

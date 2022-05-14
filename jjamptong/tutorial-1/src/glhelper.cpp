@@ -28,9 +28,6 @@ GLHelper::RenderMode GLHelper::currRenderMode = NORMAL;
 GLHelper::CameraMode GLHelper::currCameraMode = IDLE;
 GLboolean GLHelper::animated = GL_TRUE;
 GLboolean GLHelper::justAnimated = GL_FALSE;
-GLboolean GLHelper::mouseClicked = GL_FALSE;
-glm::vec2 GLHelper::mouse_pos = glm::vec2(0.0f, 0.0f);
-glm::vec2 GLHelper::world_mouse_pos = glm::vec2(0.0f, 0.0f);
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -277,15 +274,6 @@ void GLHelper::mousebutton_cb(GLFWwindow *pwin, int button, int action, int mod)
 #endif
     break;
   }
-
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-  {
-      mouseClicked = GL_TRUE;
-  }
-  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-  {
-      mouseClicked = GL_FALSE;
-  }
 }
 
 /*  _________________________________________________________________________*/
@@ -309,10 +297,6 @@ void GLHelper::mousepos_cb(GLFWwindow *pwin, double xpos, double ypos) {
 #ifdef _DEBUG
   //std::cout << "Mouse cursor position: (" << xpos << ", " << ypos << ")" << std::endl;
 #endif
-    mouse_pos.x = static_cast<float>(xpos * 2) / width - 1.f;
-    mouse_pos.y = static_cast<float>(ypos * -2) / height + 1.f;
-
-    world_mouse_pos = glm::vec2(xpos, ypos);
 }
 
 /*  _________________________________________________________________________*/

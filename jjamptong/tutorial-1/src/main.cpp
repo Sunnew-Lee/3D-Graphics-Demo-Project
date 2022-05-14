@@ -9,7 +9,7 @@
 // CS250
 // 2022 spring
 
-This file uses functionality defined in types GLHelper and GLApp to initialize
+This file uses functionality defined in types GLHelper and GLApp to initialize 
 an OpenGL context and implement a game loop.
 
 *//*__________________________________________________________________________*/
@@ -24,13 +24,13 @@ an OpenGL context and implement a game loop.
 #include <sstream>
 #include <iomanip>
 #include <IG.h>
+#include <glDemo.h>
 
-//#include <Noise.h>
-#include <PerlinNoise.h>
-#include <Perlin_Terrain.h>
-#include <CatmullRomSplines.h>
-#include <Geometry.h>
+/*                                                   type declarations
+----------------------------------------------------------------------------- */
 
+/*                                                      function declarations
+----------------------------------------------------------------------------- */
 static void draw();
 static void update();
 static void init();
@@ -38,67 +38,55 @@ static void cleanup();
 
 //¿¹½Ã
 
-//ValueNoise valueNoise;
-PerlinNoise perlinNoise;
-Perlin_Terrain perlinTerrain;
-CatmullRomSplines catmullRomSplines;
-Geometry geo;
-
-//**********************************************************************************************************//
-//Release ----> PerlinNoise
-//Debug	  ----> PerlinTerrain
-//**********************************************************************************************************//
 
 int main() {
-	init();
+  init();
 
-	while (!glfwWindowShouldClose(GLHelper::ptr_window)) {
+  while (!glfwWindowShouldClose(GLHelper::ptr_window)) {
 
-		update();
+    update();
 
-		draw();
-	}
+    draw();
+  }
 
-	cleanup();
+  cleanup();
 }
 
 static void init() {
-	if (!GLHelper::init(1200, 675, "CS250 Project")) {
-		std::cout << "Unable to create OpenGL context" << std::endl;
-		std::exit(EXIT_FAILURE);
-	}
+    if (!GLHelper::init(1200, 675, "CS250 Project")) {
+        std::cout << "Unable to create OpenGL context" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
-	geo.init();
-	//catmullRomSplines.init();
+	//GLApp::init();
+    GLDemo::init();
 }
 
 static void update() {
-	glfwPollEvents();
+  glfwPollEvents();
 
-	// time between previous and current frame
-	double delta_time = GLHelper::update_time(1.0);
+  // time between previous and current frame
+  double delta_time = GLHelper::update_time(1.0);
 
-	std::stringstream sstr;
-	sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
-	glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
-
-	geo.update(delta_time);
-	//catmullRomSplines.update(delta_time);
+  std::stringstream sstr;
+  sstr << std::fixed << std::setprecision(2) << GLHelper::title << ": " << GLHelper::fps;
+  glfwSetWindowTitle(GLHelper::ptr_window, sstr.str().c_str());
+ 
+  //GLApp::update(delta_time);
+  GLDemo::update(delta_time);
 }
 
 static void draw() {
-	ImGui::Render();
+   ImGui::Render();
+    
+  //GLApp::draw();
+  GLDemo::draw();
 
-	geo.draw();
-	//catmullRomSplines.draw();
-
-	glfwSwapBuffers(GLHelper::ptr_window);
+  glfwSwapBuffers(GLHelper::ptr_window);
 }
 
 static void cleanup() {
-
-	geo.cleanup();
-	//catmullRomSplines.cleanup();
-
-	GLHelper::cleanup();
+  //GLApp::cleanup();
+  GLDemo::cleanup();
+  GLHelper::cleanup();
 }

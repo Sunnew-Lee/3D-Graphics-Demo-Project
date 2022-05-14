@@ -24,9 +24,9 @@
 /*  Vertex format */
 struct Vertex
 {
-    Vertex(Vec3 pos, Vec3 nrm, Vec3 uv) : pos(pos), nrm(nrm), uv(uv) {}
+    Vertex(Vec3 pos, Vec3 nrm, Vec3 uv) : pos(pos), nrm(nrm), uv(uv){}
 
-    Vertex() { }
+    Vertex(){ }
 
     Vec3 pos, nrm;
     Vec2 uv;
@@ -36,7 +36,7 @@ const int vertexSize = sizeof(Vertex);
 const int indexSize = sizeof(int);
 
 
-/*  The layouts for specifying the offsets of a vertex
+/*  The layouts for specifying the offsets of a vertex 
     when it is copied into the graphics pipeline. */
 struct VertexLayout
 {
@@ -64,7 +64,7 @@ typedef std::vector<int> IndexBufferType;
 /*  Mesh format */
 struct Mesh
 {
-    Mesh() : numVertices(0), numTris(0), numIndices(0) { }
+    Mesh() : numVertices(0), numTris(0), numIndices(0){ }
 
     /*  Storing the actual vertex/index data */
     VertexBufferType vertexBuffer;
@@ -74,9 +74,9 @@ struct Mesh
     int numTris;
     int numIndices;
 
-    /*  Once the buffer data has been copied into the pipeline, these array object and
+    /*  Once the buffer data has been copied into the pipeline, these array object and 
         buffer objects will store  its "states".
-        Later on if we want to render a mesh, we just need to bind the VAO.
+        Later on if we want to render a mesh, we just need to bind the VAO. 
         We don't need to copy the buffer data again.
     */
     GLuint VAO;
@@ -98,15 +98,15 @@ Mesh CreateCone(int stacks, int slices);
 /******************************************************************************/
 /*  Pre-defined shapes                                                        */
 /******************************************************************************/
-enum MeshID { PLANE, CUBE, SPHERE, CYLINDER, CONE, PARTIAL_TORUS, TORUS, NUM_MESHES };
+enum MeshID {  SPHERE, NUM_MESHES };
 
-static Mesh mesh[NUM_MESHES] = { CreatePlane(50,50),
-                                    CreateCube(1, 1),       /*  For torso, feet */
+static Mesh mesh[NUM_MESHES] =  {  // CreatePlane(50,50),
+                                   // CreateCube(1, 1),       /*  For torso, feet */
                                     CreateSphere(16, 16),   /*  For head */
-                                    CreateCylinder(1, 8),   /*  For arms, legs */
-                                    CreateCone(16, 8),      /*  For hat */
-                                    CreateTorus(4, 8, QUARTER_PI, TWO_PI - QUARTER_PI), /*  For hands */
-                                    CreateTorus(16, 32, 0, TWO_PI)                      /*  For base */
-};
+                                    //CreateCylinder(1, 8),   /*  For arms, legs */
+                                    //CreateCone(16, 8),      /*  For hat */
+                                    //CreateTorus(4, 8, QUARTER_PI, TWO_PI - QUARTER_PI), /*  For hands */
+                                    //CreateTorus(16, 32, 0, TWO_PI)                      /*  For base */
+                                };
 
 #endif
