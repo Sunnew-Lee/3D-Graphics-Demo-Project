@@ -7,7 +7,6 @@
 
 void Geometry::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
-
 	SetUp();
 
 	GLubyte const* str_ven = glGetString(GL_VENDOR);
@@ -27,14 +26,17 @@ void Geometry::init() {
 
 void Geometry::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	Render();
+
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
 
 	IG::update();
+	Render();
 }
 
 void Geometry::draw() {
 	//glClear(GL_COLOR_BUFFER_BIT);
 
+	
 	//mdl.draw();
 	IG::draw();
 }

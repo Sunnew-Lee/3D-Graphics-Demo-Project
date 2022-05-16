@@ -57,5 +57,6 @@ void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
 void Render();
+void Draw();
 
 #endif

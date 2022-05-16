@@ -83,7 +83,7 @@ const Object base
                     * Scale(15.0f, 15.0f, 15.0f),                             /*  Self-transform */
                     Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
                     YAXIS,                                                      /*  Rotation w.r.t. parent */
-                    0.0f
+                    10.0f
                                                                       /*  Texture image ID */
                 };
 

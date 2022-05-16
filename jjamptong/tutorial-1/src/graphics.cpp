@@ -12,6 +12,7 @@
 /******************************************************************************/
 
 #include "graphics.hpp"
+#include "mesh.hpp"
 //#include "textfile.h"
 //#include "image_io.h"
 
@@ -19,6 +20,7 @@
 #include <glslshader.h>
 #include <glhelper.h>
 #include <input.hpp>
+#include <random>
 
 
 /*  Viewport width & height */
@@ -79,6 +81,9 @@ GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc;
 GLSLShader shdr_pgm;
 
 
+static float Inner = 1.f;
+static float Outer = 1.f;
+
 void ValidateShader(GLuint shader, const char *file)
 {
     const unsigned int BUFFER_SIZE = 512;
@@ -112,6 +117,8 @@ void CompileShaders()
     shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shader.vert"));
     shdr_files.push_back(std::make_pair(GL_GEOMETRY_SHADER, "../shaders/shader.geom"));
     shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
+    shdr_files.push_back(std::make_pair(GL_TESS_CONTROL_SHADER, "../shaders/shader.tcs"));
+    shdr_files.push_back(std::make_pair(GL_TESS_EVALUATION_SHADER, "../shaders/shader.tes"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -229,7 +236,7 @@ void SetUp()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
+   // glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
 
     shdr_pgm.UnUse();
 }
@@ -312,7 +319,7 @@ void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
     /*  Tell shader to use obj's VAO for rendering */
         
     glBindVertexArray(mesh[obj.meshID].VAO);
-    glDrawElements(GL_TRIANGLES, mesh[obj.meshID].numIndices, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_PATCHES, mesh[obj.meshID].numIndices, GL_UNSIGNED_INT, nullptr);
 }
 
 
@@ -372,6 +379,23 @@ void Render()
     shdr_pgm.Use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    GLint InnerLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "TessLevelInner");
+    GLint OuterLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "TessLevelOuter");
+
+   // glUniform1f(InnerLoc, Inner);
+   // glUniform1f(InnerLoc, Outer);
+
+    if (ImGui::SliderFloat("Inner", &Inner, 1.0f, 4.0f))
+    {
+        glUniform1f(InnerLoc, Inner);
+    }
+    if (ImGui::SliderFloat("Outer", &Outer, 1.0f, 4.0f))
+    {
+        glUniform1f(InnerLoc, Outer);
+    }
+    
+
     if (GLHelper::animated)
     {
         tempTime = clock();
@@ -402,14 +426,15 @@ void Render()
     //UpdateUniforms_Draw(wall, wallMVPMat);
 
     //glUniform1f(sin_valLoc, glm::sin(static_cast<float>(clock())*0.5));
+
+
     UpdateUniforms_Draw(base, baseMVPMat);
     
 
     //for (int i = 0; i < 1; ++i)
     //{
     //    if (GLHelper::animated || eyeMoved || resized)
-    //        UpdateTransform(i);
-
+    //        UpdateTransform(i)
     //    /*  Send each part's data to shaders for rendering */
     //    UpdateUniforms_Draw(part[i], partMVPMat[i]);
     //}
