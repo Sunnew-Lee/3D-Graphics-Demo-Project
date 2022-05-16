@@ -15,7 +15,7 @@ out vec4 gColor;
 vec4 Verts[3];
 
 float random2d(vec2 coord){
-    return fract(tan(dot(coord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+    return fract(sin(dot(coord.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
 mat3 rotate(float angle){
@@ -46,11 +46,11 @@ void main(void)
 
     gColor = teColor[0];
     gl_Position = Verts[0];
-    gl_Position.x += random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) ;   
+    gl_Position.x += random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) *0.75 ;   
     EmitVertex();
 
     gl_Position = Verts[0];
-    gl_Position.x -= random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x)));
+    gl_Position.x -= random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) * 0.75;
     EmitVertex();
 
     // vec3 vc = gl_in[1].gl_Position.xyz -  gl_in[0].gl_Position.xyz;

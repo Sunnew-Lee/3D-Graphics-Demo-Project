@@ -386,11 +386,11 @@ void Render()
    // glUniform1f(InnerLoc, Inner);
    // glUniform1f(InnerLoc, Outer);
 
-    if (ImGui::SliderFloat("Inner", &Inner, 1.0f, 4.0f))
+    if (ImGui::SliderFloat("Inner", &Inner, 1.0f, 5.0f))
     {
         glUniform1f(InnerLoc, Inner);
     }
-    if (ImGui::SliderFloat("Outer", &Outer, 1.0f, 4.0f))
+    if (ImGui::SliderFloat("Outer", &Outer, 1.0f, 5.0f))
     {
         glUniform1f(InnerLoc, Outer);
     }
