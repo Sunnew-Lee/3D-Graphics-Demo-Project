@@ -84,7 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Geometry.h" />
+    <ClInclude Include="include\Tessellation.h" />
     <ClInclude Include="include\glapp.h" />
     <ClInclude Include="include\glDemo.h" />
     <ClInclude Include="include\glhelper.h" />
@@ -102,7 +102,7 @@
     <ClInclude Include="include\Toon_Shading-Fog.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Geometry.cpp" />
+    <ClCompile Include="src\Tessellation.cpp" />
     <ClCompile Include="src\glapp.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\glslshader.cpp" />

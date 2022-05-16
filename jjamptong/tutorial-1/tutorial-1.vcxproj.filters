@@ -51,7 +51,7 @@
     <ClInclude Include="include\Toon_Shading-Fog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Geometry.h">
+    <ClInclude Include="include\Tessellation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,7 +86,7 @@
     <ClCompile Include="src\Toon_Shading-Fog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Geometry.cpp">
+    <ClCompile Include="src\Tessellation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

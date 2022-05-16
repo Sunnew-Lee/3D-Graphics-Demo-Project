@@ -1,11 +1,11 @@
-#include <Geometry.h>
+#include <Tessellation.h>
 #include <IG.h>
 #include <graphics.hpp>
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
 //static GLNew    g_glnew;
 
-void Geometry::init() {
+void Tessellation::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 	SetUp();
 
@@ -24,7 +24,7 @@ void Geometry::init() {
 	IG::init();
 }
 
-void Geometry::update(double delta_time) {
+void Tessellation::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
 
 	glPatchParameteri(GL_PATCH_VERTICES, 3);
@@ -33,7 +33,7 @@ void Geometry::update(double delta_time) {
 	Render();
 }
 
-void Geometry::draw() {
+void Tessellation::draw() {
 	//glClear(GL_COLOR_BUFFER_BIT);
 
 	
@@ -41,7 +41,7 @@ void Geometry::draw() {
 	IG::draw();
 }
 
-void Geometry::cleanup() {
+void Tessellation::cleanup() {
 	// empty for now
 	IG::cleanup();
 }

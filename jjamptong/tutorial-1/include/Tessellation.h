@@ -4,11 +4,11 @@
 
 //class IG;
 
-class Geometry : public GLDemo
+class Tessellation : public GLDemo
 {
 public:
-	Geometry() {};
-	~Geometry() override {};
+	Tessellation() {};
+	~Tessellation() override {};
 
 	void init() override;
 	void update(double delta_time) override;

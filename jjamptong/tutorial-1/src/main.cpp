@@ -27,7 +27,7 @@ an OpenGL context and implement a game loop.
 
 #include <Procedural_Modeling.h>
 #include <Toon_Shading-Fog.h>
-#include <Geometry.h>
+#include <Tessellation.h>
 
 static void draw();
 static void update();
@@ -38,7 +38,9 @@ static void cleanup();
 
 P_Modeling P_Model;
 Toon_Fog toon_fog;
-Geometry geometry;
+//Geometry geometry;
+Tessellation tessellation;
+
 
 int main() {
 	init();
@@ -62,7 +64,7 @@ static void init() {
 	//GLApp::init();
 	//P_Model.init();
 	//toon_fog.init();
-	geometry.init();
+	tessellation.init();
 }
 
 static void update() {
@@ -78,7 +80,7 @@ static void update() {
 	//GLApp::update(delta_time);
 	//P_Model.update(delta_time);
 	//toon_fog.update(delta_time);
-	geometry.update(delta_time);
+	tessellation.update(delta_time);
 }
 
 static void draw() {
@@ -87,7 +89,7 @@ static void draw() {
 	//GLApp::draw();
 	//P_Model.draw();
 	//toon_fog.draw();
-	geometry.draw();
+	tessellation.draw();
 
 	glfwSwapBuffers(GLHelper::ptr_window);
 }
@@ -96,6 +98,6 @@ static void cleanup() {
 	//GLApp::cleanup();
 	//P_Model.cleanup();
 	//toon_fog.cleanup();
-	geometry.cleanup();
+	tessellation.cleanup();
 	GLHelper::cleanup();
 }
