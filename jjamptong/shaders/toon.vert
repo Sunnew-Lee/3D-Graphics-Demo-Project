@@ -24,6 +24,5 @@ void main()
     //v_normal=u_normalMatrix*nrm;
     
     float distance=length(gl_Position.xyz); // mvpMat * vec4(pos, 1.0);
-    visibility=exp(-pow((distance*density),gradient));
     visibility=clamp(visibility,0.,1.);
 }

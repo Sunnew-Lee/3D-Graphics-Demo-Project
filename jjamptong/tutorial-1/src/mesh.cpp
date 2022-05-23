@@ -50,8 +50,7 @@ Mesh CreatePlane(int stacks, int slices)
             Vertex v;
 
             v.pos = Vec3(col - 0.5f, 0.5f - row, 0.0f);
-            v.nrm = Vec3(v.pos.x, v.pos.y, 1.0f);
-
+            v.nrm = Vec3(v.pos.x, v.pos.y, -1.0f);
             v.uv = Vec2(col, row);
 
             addVertex(mesh, v);
@@ -276,7 +275,7 @@ Mesh CreateCylinder(int stacks, int slices)
                 vertex.pos = Vec3(0.5 * sinAlpha, -0.5, 0.5 * cosAlpha);
 
                 vertex.nrm.x = vertex.pos.x / 0.5f;
-                vertex.nrm.y = vertex.pos.y / 0.5f;
+                vertex.nrm.y = vertex.pos.y / -0.5f;
                 vertex.nrm.z = vertex.pos.z / 0.5f;
             }
 
@@ -353,6 +352,8 @@ Mesh CreateTorus(int stacks, int slices, float startAngle, float endAngle)
             vertex.nrm /= r;
 
             vertex.pos /= -2 * (R + r);
+
+
             addVertex(mesh, vertex);
         }
     }
@@ -475,10 +476,11 @@ void BuildIndexBuffer(int stacks, int slices, Mesh& mesh)
     int stride = slices + 1;
     for (int i = 0; i < stacks; ++i)
     {
-        int curr_row = i * stride;
+        
 
         for (int j = 0; j < slices; ++j)
         {
+            int curr_row = i * stride;
             /*  You need to compute the indices for the first triangle here */
             /*  ... */
             p0 = curr_row + j;

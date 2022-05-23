@@ -26,18 +26,13 @@ void main(void)
     
     
     float level=floor(nl*levels);
-    nl=level/levels;
-    
-    if(nl>=0&&nl<.25){nl=.25;}
-    else if(nl>=.25&&nl<.5){nl=.5;}
-    else if(nl>=.5&&nl<.75){nl=.75;}
-    else if(nl>=.75&&nl<1){nl=1.;}
 
+ 
     vec3 diffuse = nl * u_lightColor;
 
     vec3 temp_color=(u_ambient+diffuse)*color.xyz;
 
     outColor=vec4(temp_color,1);
 
-    outColor = mix(vec4(fogColor,1.),outColor,visibility);   /* Use obj's color as usual */
+    outColor = mix(vec4(fogColor,1.),outColor,1.0);   /* Use obj's color as usual */
 }

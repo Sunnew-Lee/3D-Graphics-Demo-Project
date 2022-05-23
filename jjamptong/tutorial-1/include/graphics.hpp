@@ -47,10 +47,11 @@ const int EYE_MAX_ALPHA     = NUM_STEPS_PI / 2 - 1;
 const int EYE_MIN_ALPHA     = -EYE_MAX_ALPHA + 1;
 const int EYE_ANGLE_STEP    = 1;
 /*  Limit for camera distance from the origin */
-const int EYE_MAX_RADIUS    = 40;
-const int EYE_MIN_RADIUS    = 15;
+const int EYE_MAX_RADIUS    = 30;
+const int EYE_MIN_RADIUS    = 1;
 const int EYE_RADIUS_STEP   = 1;
 
+static GLuint shadowFBO;
 
 /*  Public functions */
 void SetUp();
