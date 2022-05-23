@@ -176,7 +176,7 @@ void SendVertexData(Mesh &mesh)
                     GL_STATIC_DRAW);
      
     /*  Send vertex attributes to shaders */
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         glEnableVertexAttribArray(vLayout[i].location);
         glVertexAttribPointer(vLayout[i].location, vLayout[i].size, vLayout[i].type, 
