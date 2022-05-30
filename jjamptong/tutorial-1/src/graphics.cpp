@@ -28,7 +28,7 @@ int height  = 675;
 
 /*  Camera view volume planes */
 float nearPlane     = 1.0f;
-float farPlane      = 80.0f;
+float farPlane      = 800.0f;
 float topPlane      = 0.6f * nearPlane;
 float bottomPlane   = -topPlane;
 float aspect        = 1.0f * width / height;
@@ -274,7 +274,7 @@ void UpdateTransform(int partID)
                 rotAngle = part[partID].rotAmount * std::sinf(phase);
             }
 
-            rotationMat = Rotate(rotAngle, part[partID].rotAxis);
+            //rotationMat = Rotate(rotAngle, part[partID].rotAxis);
         }
         else
             rotationMat = Mat4(1.0f);   /*  No rotation */
@@ -323,7 +323,7 @@ void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
 	// = glm::perspective(glm::radians(45.f), (float)GLHelper::width / (float)GLHelper::height, nearPlane, farPlane);
 
 
-    glUniformMatrix4fv(shadowLoc, 1, GL_FALSE, ValuePtr(Lightproj * Lightview));
+    glUniformMatrix4fv(shadowLoc, 1, GL_FALSE, ValuePtr(shadowBias * Lightproj * Lightview));
    
     /*  Tell shader to use obj's VAO for rendering */
         
@@ -336,7 +336,7 @@ void CleanUp()
 {
     glBindVertexArray(0);
     
-    for (int i = 0; i < NUM_MESHES; ++i)
+    for (int i = 0; i < NUM_MESHES-1; ++i)
     {
         glDeleteVertexArrays(1, &mesh[i].VAO);
         glDeleteBuffers(1, &mesh[i].VBO);
@@ -420,7 +420,7 @@ void Render()
     GLuint depthTex;
     glGenTextures(1, &depthTex);
     glBindTexture(GL_TEXTURE_2D, depthTex);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, GLHelper::width, GLHelper::height);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
@@ -446,12 +446,17 @@ void Render()
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, GLHelper::width, GLHelper::height);
     glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index);
-    glEnable(GL_FRONT_FACE);
-
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    //glEnable(GL_FRONT_FACE);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(2.5f, 10.0f);
    // UpdateUniforms_Draw(wall, Lightproj * Lightview * wall.selfMat);
+
+    ComputeViewProjMats();
     UpdateUniforms_Draw(base, Lightproj * Lightview * base.selfMat);
 
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < NUM_MESHES-1; ++i)
     {
         if (GLHelper::animated || eyeMoved || resized)
             partMVPMat[i] = Lightproj * Lightview * transformMat[i] * part[i].selfMat;
@@ -462,7 +467,8 @@ void Render()
     }
 
     // Revert to the default framebuffer for now
-    glEnable(GL_CULL_FACE);
+   // glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glFlush();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     //카메라입장에서 그려
@@ -480,7 +486,7 @@ void Render()
    // UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat);
 
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < NUM_MESHES-1; ++i)
     {
         if (GLHelper::animated || eyeMoved || resized)
             UpdateTransform(i);

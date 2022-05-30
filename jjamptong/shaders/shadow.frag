@@ -47,7 +47,7 @@ void shadeWithShadow() {
   float shadow = textureProj(ShadowMap, ShadowCoord); 
  
   // If the fragment is in shadow, use ambient light only. 
-    outColor = vec4((diffSpec * shadow + ambient) , 1.0); 
+    outColor = vec4((diffSpec * shadow + ambient) * color.xyz , 1.0); 
     outColor = mix(vec4(fogColor,1.),outColor,1.0);   /* Use obj's color as usual */
 } 
 subroutine (RenderPassType) 

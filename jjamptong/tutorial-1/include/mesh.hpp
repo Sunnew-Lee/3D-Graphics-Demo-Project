@@ -96,15 +96,15 @@ Mesh CreateCone(int stacks, int slices);
 /*  Pre-defined shapes                                                        */
 /******************************************************************************/
 //enum MeshID { PLANE, CUBE, SPHERE, CYLINDER, CONE, PARTIAL_TORUS, TORUS, NUM_MESHES };
-enum MeshID { PLANE, SPHERE, TORUS, NUM_MESHES };
+enum MeshID { PLANE, CUBE, SPHERE, CONE, CYLINDER,/*TORUS,*/ NUM_MESHES };
 
 static Mesh mesh[NUM_MESHES] =  {   CreatePlane(50,50),
-                                    //CreateCube(1, 1),       /*  For torso, feet */
+                                    CreateCube(3, 3),       /*  For torso, feet */
                                     CreateSphere(16, 16),   /*  For head */
-                                    //CreateCylinder(1, 8),   /*  For arms, legs */
-                                    //CreateCone(16, 8),      /*  For hat */
+                                    CreateCone(16, 8),      /*  For hat */
+                                    CreateCylinder(1, 8),   /*  For arms, legs */
                                     //CreateTorus(4, 8, QUARTER_PI, TWO_PI - QUARTER_PI), /*  For hands */
-                                    CreatePlane(16, 32)                      /*  For base */
+                                   // CreatePlane(16, 32)                      /*  For base */
                                 };
 
 #endif

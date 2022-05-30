@@ -63,7 +63,7 @@ const PartID parent[NUM_PARTS]
 enum ImageID { BRICKS, FACE, JEANS, BALOONS, NUM_IMAGES };
 
 
-const Object wall
+ const Object wall
 {
     PLANE,
     Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
@@ -80,7 +80,7 @@ const Object base
                     PLANE,
                     Vec4(0.615f ,0.0f,1.0f, 1.0f),                               /*  Color */
                     Translate(0.0f, -7.5f, 0.0f)* Rotate(PI/2., XAXIS)
-                    * Scale(40.5f, 35.0f, 20.5f),                             /*  Self-transform */
+                    * Scale(100.f, 100.f, 100.f),                             /*  Self-transform */
                     Mat4(1.0f),                                                 /*  Translation w.r.t. parent */
                     YAXIS,                                                      /*  Rotation w.r.t. parent */
                     0.0f
@@ -88,16 +88,16 @@ const Object base
                 };
 
 
-const Object part[1] 
+const Object part[4] 
                 {
-                    //{   /*  TORSO       */
-                    //    CUBE,
-                    //    Vec4(Torso_color.x,Torso_color.y,Torso_color.z,Torso_color.w),                           /*  Color */
-                    //    Translate(0.0f, -0.1f, 0.0f) * Scale(2.5f, 4.2f, 1.3f), /*  Self-transform */
-                    //    Translate(6.9f, 0.0f, 0.0f),                            /*  Translation w.r.t. parent */
-                    //    YAXIS,                                                  /*  Rotation w.r.t. parent */
-                    //    1.0f
-                    //},
+                    {   /*  TORSO       */
+                        CUBE,
+                        Vec4(Torso_color.x,Torso_color.y,Torso_color.z,Torso_color.w),                           /*  Color */
+                        Translate(5.f, -5.f, 5.f) * Scale(2.5f, 4.2f, 1.3f), /*  Self-transform */
+                        Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
+                        YAXIS,                                                  /*  Rotation w.r.t. parent */
+                        1.0f
+                    },
                     {
                         /*  HEAD        */
                         SPHERE,
@@ -108,14 +108,14 @@ const Object part[1]
                         0.0f
                                                                           /*  Texture image ID */
                     },
-                    //{   /*  HAT         */
-                    //    CONE,
-                    //    Vec4(Hat_color.x,Hat_color.y,Hat_color.z,Hat_color.w),                        /*  Color */
-                    //    Scale(1.6f, 1.5f, 1.6f) * Rotate(SIXTEENTH_PI, XAXIS),  /*  Self-transform */
-                    //    Translate(0.0f, 1.1f, 0.2f),                            /*  Translation w.r.t. parent */
-                    //    YAXIS,                                                  /*  Rotation w.r.t. parent */
-                    //    0.0f                                                /*  Texture image ID */
-                    //},
+                    {   /*  HAT         */
+                        CONE,
+                        Vec4(Hat_color.x,Hat_color.y,Hat_color.z,Hat_color.w),                        /*  Color */
+                        Translate(11.f, -5.f, -11.6f)* Scale(5.f, 12.f, 3.f),  /*  Self-transform */
+                        Translate(0.0f, 2.7f, 0.0f),                           /*  Translation w.r.t. parent */
+                        YAXIS,                                                  /*  Rotation w.r.t. parent */
+                        0.0f                                                /*  Texture image ID */
+                    },
                     //{   /*  LEFT ARM    */
                     //    CYLINDER,
                     //    Vec4(1.0f, 0.0f, 0.0f, 1.0f),                           /*  Color */
@@ -127,10 +127,10 @@ const Object part[1]
                     //{   /*  RIGHT ARM   */
                     //    CYLINDER,
                     //    Vec4(0.7f, 0.7f, 1.0f, 1.0f),                           /*  Color */
-                    //    Translate(0.0f, -2.0f, 0.0f) * Scale(0.7f, 4.0f, 0.7f), /*  Self-transform: translate off so that center of rotation is at shoulder */
-                    //    Translate(-1.6f, 1.8f, 0.0f),                           /*  Translation w.r.t. parent */
-                    //    XAXIS,                                                  /*  Rotation w.r.t. parent */
-                    //    -EIGHTH_PI
+                    //    Scale(100.f, 100.f, 100.f),                                /*  Self-transform */
+                    //    Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
+                    //    YAXIS,                                                  /*  Rotation w.r.t. parent */
+                    //    0.0f
                     //},
                     //{   /*  LEFT HAND   */
                     //    PARTIAL_TORUS,
@@ -144,14 +144,14 @@ const Object part[1]
                     //    Rotate(HALF_PI, XAXIS) * Scale(0.6f, 0.7f, 0.6f),       /*  Self-transform */
                     //    Translate(0.0f, -4.2f, 0.0f)                            /*  Translation w.r.t. parent */
                     //},
-                    //{   /*  LEFT LEG    */
-                    //    CYLINDER,
-                    //    Vec4(1.0f, 0.0f, 0.0f, 1.0f),                        /*  Color */
-                    //    Translate(0.0f, -2.5f, 0.0f) * Scale(1.2f, 5.0f, 1.2f), /*  Self-transform: translate off so that center of rotation is at hip */
-                    //    Translate(-0.6f, -2.0f, 0.0f),                          /*  Translation w.r.t. parent */
-                    //    XAXIS,                                                  /*  Rotation w.r.t. parent */
-                    //    EIGHTH_PI                                                 /*  Texture image ID */
-                    //},
+                    {   /*  LEFT LEG    */
+                        CYLINDER,
+                        Vec4(1.0f, 0.0f, 0.0f, 1.0f),                        /*  Color */
+                        Translate(-10.f, -5.5f, -15.f) * Scale(1.2f, 5.0f, 1.2f), /*  Self-transform: translate off so that center of rotation is at hip */
+                        Translate(0.0f, 2.7f, 0.0f),                            /*  Translation w.r.t. parent */
+                        YAXIS,                                                  /*  Rotation w.r.t. parent */
+                        0.0f                                               /*  Texture image ID */
+                    },
                     //{   /*  RIGHT LEG    */
                     //    CYLINDER,
                     //    Vec4(0.19f, 0.22f, 0.26f, 1.0f),                        /*  Color */
