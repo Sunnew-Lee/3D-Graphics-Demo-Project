@@ -31,11 +31,12 @@ void main(void)
 
     gColor = vec4(uColor,1.0);
     Verts[0] = (gl_in[0].gl_Position+ gl_in[1].gl_Position + gl_in[2].gl_Position)/3;
-    Verts[0].y +=  height;
+    Verts[0].y += shrink * height;
     //Verts[0].z += sin;
     //gl_Position = Verts[0] +Verts[0]+ shrink * ( gl_in[2].gl_Position - Verts[0]);
     gl_Position = Verts[0];
     EmitVertex();
+
 
     gColor = vColor[0];
     gl_Position =  Verts[0] + shrink * (gl_in[0].gl_Position - Verts[0]);
