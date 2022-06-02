@@ -64,9 +64,10 @@ Mat4 viewMat, projMat, vpMat;
 
 const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 
-
-
-
+float shrink = 1.0f;
+float center = 0.75f;
+float grassHeight = 2.0f;
+glm::vec3 uColor = Vec3( 0.56, 0.8, 0.56 );
 /*  Shader filenames */
 
 
@@ -74,7 +75,7 @@ const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc;
+GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc, shrinkLoc, centerLoc, heightLoc, uColorLoc;
 
 GLSLShader shdr_pgm;
 
@@ -211,6 +212,10 @@ void SetUp()
     modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
     sin_valLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "sin");
+    shrinkLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "shrink");
+    centerLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "center");
+    heightLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "height");
+    uColorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "uColor");
     
     ComputeViewProjMats();
 
@@ -402,6 +407,14 @@ void Render()
     //UpdateUniforms_Draw(wall, wallMVPMat);
 
     //glUniform1f(sin_valLoc, glm::sin(static_cast<float>(clock())*0.5));
+    ImGui::SliderFloat("Shrink", &shrink, 0.00f, 1.00f);
+    ImGui::SliderFloat("CenterLocation", &center, 0.25f, 1.00f);
+    ImGui::SliderFloat("GrassHeight", &grassHeight, 1.0f, 5.0f);
+    ImGui::SliderFloat3("GrassColor", &uColor.x, 0.f, 1.f);
+    glUniform1f(shrinkLoc, shrink);
+    glUniform1f(centerLoc, center);
+    glUniform1f(heightLoc, grassHeight);
+    glUniform3fv(uColorLoc,1,glm::value_ptr(uColor));
     UpdateUniforms_Draw(base, baseMVPMat);
     
 

@@ -27,9 +27,9 @@ void Geometry::init() {
 
 void Geometry::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
-	Render();
 
 	IG::update();
+	Render();
 }
 
 void Geometry::draw() {
