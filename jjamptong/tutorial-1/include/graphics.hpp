@@ -58,5 +58,6 @@ void SetUp();
 void CleanUp();
 void Resize(const int w, const int h);
 void Render();
+void DrawMetal( float rough, int metal,  glm::vec3 color = glm::vec3(1, 0.71f, 0.29f));
 
 #endif

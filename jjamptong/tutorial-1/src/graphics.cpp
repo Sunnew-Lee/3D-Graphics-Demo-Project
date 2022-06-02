@@ -56,12 +56,19 @@ float rotAngle;
 Mat4 rotationMat;               /*  get computed every frame independent so no need to keep track */
 Mat4 transformMat[NUM_PARTS];   /*  hierarchical transform, child is affected by parent */
 
-Mat4 baseMVPMat, wallMVPMat, partMVPMat[NUM_PARTS];
+Mat4 baseMVPMat, wallMVPMat, partMVMat[NUM_PARTS], partMVPMat[NUM_PARTS], baseMVMat;
 
 /*  Matrices for view/projetion transformations */
 Mat4 viewMat, projMat, vpMat;
 
 Vec3 lightPos = {2,15,0};
+
+glm::vec3 ll0 = glm::vec3{ 0 };
+glm::vec3 ll1 = glm::vec3{ 0 };
+glm::vec3 ll2 = glm::vec3{ 0 };
+glm::vec4 lp0 = glm::vec4{ 0 };
+glm::vec4 lp1 = glm::vec4{ 0 };
+glm::vec4 lp2 = glm::vec4{ 0 };
 
 const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 
@@ -69,14 +76,16 @@ Mat4  shadowBias = Mat4(0);
 Mat4 Lightview = Mat4(0);
 Mat4 Lightproj = Mat4(0);
 
+float lightAngle = 0.0f;
+float lightRotationSpeed = 1.5f;
+
 /*  Shader filenames */
 
-GLuint pass1Index, pass2Index;
 /*  ID of the set of shaders that we'll use */
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint colorLoc, mvpMatLoc, modelLoc, shadowLoc, lightLoc;
+GLint mvpMatLoc, modelviewMatLoc, normalMatLoc, ProjectionMatLoc;
 
 GLSLShader shdr_pgm;
 
@@ -111,8 +120,8 @@ void CompileShaders()
     //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shader.frag"));
 
     //////////////////////////////////////////////////////////////////////////////////////// For Toon_Shading
-    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/shadow.vert"));
-    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/shadow.frag"));
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/PBR.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/PBR.frag"));
     shdr_pgm.CompileLinkValidate(shdr_files);
     if (GL_FALSE == shdr_pgm.IsLinked()) {
         std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -163,13 +172,6 @@ void SendVertexData(Mesh &mesh)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void ComputeViewProjMats()
-\brief
-        Set up the camera positions, orientations and view frustums.
-*/
-/******************************************************************************/
 void ComputeViewProjMats()
 {
     /*  Update view transform matrix */
@@ -184,22 +186,13 @@ void ComputeViewProjMats()
     if (eyeMoved || resized)
     {
         vpMat = projMat * viewMat;
+        baseMVMat = viewMat * base.selfMat;
         baseMVPMat = vpMat * base.selfMat;
         wallMVPMat = vpMat * wall.selfMat;
     }
 }
 
 
-
-
-
-/******************************************************************************/
-/*!
-\fn     void SetUp()
-\brief
-        Set up the render program and graphics-related data for rendering.
-*/
-/******************************************************************************/
 void SetUp()
 {
     /*  Starting time */
@@ -209,13 +202,9 @@ void SetUp()
 
     /*  Obtain the locations of the variables in the shaders with the given names */
     mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
-    modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
-    colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
-    shadowLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "ShadowMatrix");
-    lightLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "lightPos");
-
-    pass1Index = glGetSubroutineIndex(shdr_pgm.GetHandle(), GL_FRAGMENT_SHADER, "recordDepth");
-	pass2Index = glGetSubroutineIndex(shdr_pgm.GetHandle(), GL_FRAGMENT_SHADER, "shadeWithShadow");
+    modelviewMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "ModelViewMatrix");
+    normalMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "NormalMatrix");
+    ProjectionMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), " ProjectionMatrix");
 
     ComputeViewProjMats();
 
@@ -225,60 +214,45 @@ void SetUp()
         SendVertexData(mesh[i]);
 
     /*  Bind framebuffer to 0 to render to the screen (by default already 0) */
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     /*  Initially drawing using filled mode */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     /*  Hidden surface removal */
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
 
-    glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
+    Lightview = glm::lookAt(lightPos, { 0.,0.,0. }, { 0.,1.,0. });
+    Lightproj = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
+
+    ll0 = glm::vec3(45.0f);
+    shdr_pgm.SetUniform("Light[0].L", ll0);
+    lp0 = Lightview * glm::vec4(lightPos, 1.0f);
+    shdr_pgm.SetUniform("Light[0].Position", lp0);
+    ll1 = glm::vec3(0.3f);
+    shdr_pgm.SetUniform("Light[1].L", ll1);
+    lp1 = glm::vec4(0, 0.15f, -1.0f, 0);
+    shdr_pgm.SetUniform("Light[1].Position", lp1);
+    ll2 = glm::vec3(45.0f);
+    shdr_pgm.SetUniform("Light[2].L", ll2);
+    lp2 = Lightview * glm::vec4(-7, 3, 7, 1);
+    shdr_pgm.SetUniform("Light[2].Position", lp2);
+
+
+    //glDepthFunc(GL_LEQUAL);
+
+    //glEnable(GL_CULL_FACE);     /*  For efficiency, not drawing back-face */
 
     shdr_pgm.UnUse();
 }
 
-/******************************************************************************/
-/*!
-\fn     void UpdateTransform(int partID)
-\brief
-        Update transformation/MVP matrices for part[partID]
-\param  partID
-        ID of the part we want to update
-*/
-/******************************************************************************/
 void UpdateTransform(int partID)
 {
     if (GLHelper::animated)
     {
         /*  Perform rotation if needed */
-        if (fabs(part[partID].rotAmount) > EPSILON)
-        {
-            if (partID == TORSO)
-            {
-                /*  torso will rotate 360degs, but we keep the angle between 0 and 360.
-                    For torso, rotAmount is rotation speed.
-                */
-                rotAngle = part[partID].rotAmount * secondsLapsed;
-                while (rotAngle > TWO_PI)
-                    rotAngle -= TWO_PI;
-            }
-            else
-            {
-                /*  Other parts, if rotated, maintain the angle between [-rotAmount, rotAmount].
-                    We simply use sine of [(secondLapsed MOD PI) * 4] to rotate in this range.
-                */
-                int isecs = static_cast<int>(secondsLapsed / PI);
-                float phase = 4.0f * (secondsLapsed - isecs * PI);
-                rotAngle = part[partID].rotAmount * std::sinf(phase);
-            }
-
-            //rotationMat = Rotate(rotAngle, part[partID].rotAxis);
-        }
-        else
-            rotationMat = Mat4(1.0f);   /*  No rotation */
-
+        
+    	rotationMat = Mat4(1.0f);   /*  No rotation */
 
         /*  Torso will translate first, then rotate, to keep a distance from the world origin */
         if (partID == TORSO)
@@ -291,39 +265,19 @@ void UpdateTransform(int partID)
     /*  Update the final MVP matrix for this part, 
         counting its own separate self-transformation that does not affect its children.
     */
+    partMVMat[partID] = viewMat * part[partID].selfMat;
     partMVPMat[partID] = vpMat * transformMat[partID] * part[partID].selfMat;
 }
 
-void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat)
+void UpdateUniforms_Draw(const Object &obj, const Mat4 &MVPMat, const Mat4 &MVMat)
 {
 
-        glUniform4fv(colorLoc, 1, ValuePtr(obj.color));
-        /*  Trigger shader to use normal for color */
-
-    /*if (obj.imageID < 0 || GLHelper::currRenderMode == GLHelper::WIREFRAME)
-        glUniform4fv(colorLoc, 1, ValuePtr(obj.color)); */
-        /*  Use obj's color if drawing wireframes or objs that don't have textures */
-    //else
-    //{
-    //    glUniform4fv(colorLoc, 1, ValuePtr(useTexture)); /* Trigger shader to use texture */
-    //	glUniform1i(textureLoc, obj.imageID);           /*  Use obj's texture ID */
-    //}
     /*  Send MVP matrix to shaders */
     glUniformMatrix4fv(mvpMatLoc, 1, GL_FALSE, ValuePtr(MVPMat));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, glm::value_ptr(glm::mat3(MVMat)));
+    glUniformMatrix3fv(modelviewMatLoc, 1, GL_FALSE, glm::value_ptr(MVMat));
 
-    glUniform3fv(lightLoc, 1, ValuePtr(lightPos));
-
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, ValuePtr(obj.selfMat));
-    shadowBias = Mat4(Vec4(0.5f, 0.0f, 0.0f, 0.0f),
-        Vec4(0.0f, 0.5f, 0.0f, 0.0f),
-        Vec4(0.0f, 0.0f, 0.5f, 0.0f),
-        Vec4(0.5f, 0.5f, 0.5f, 1.0f));
-    Lightview = glm::lookAt(lightPos, { 0.,0.,0. }, { 0.,1.,0. });
-    Lightproj = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
 	// = glm::perspective(glm::radians(45.f), (float)GLHelper::width / (float)GLHelper::height, nearPlane, farPlane);
-
-
-    glUniformMatrix4fv(shadowLoc, 1, GL_FALSE, ValuePtr(shadowBias * Lightproj * Lightview));
    
     /*  Tell shader to use obj's VAO for rendering */
         
@@ -375,18 +329,14 @@ void Resize(int w, int h)
 }
 
 
-/******************************************************************************/
-/*!
-\fn     void Render()
-\brief
-        Render function for update & drawing.
-*/
-/******************************************************************************/
 void Render()
 {
     /*  Init background color/depth */
     shdr_pgm.Use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    lp0 = Lightview * glm::vec4(lightPos, 1.0f);
+    shdr_pgm.SetUniform("Light[0].Position", lp0);
 
     if (GLHelper::animated)
     {
@@ -414,77 +364,28 @@ void Render()
     case GLHelper::FARTHER:MoveFarther(); GLHelper::currCameraMode = GLHelper::IDLE; break;
     }
 
-    GLfloat border[] = { 1.0f,0.0f,0.0f,0.0f };
-
-    //The shadowmap texture 
-    GLuint depthTex;
-    glGenTextures(1, &depthTex);
-    glBindTexture(GL_TEXTURE_2D, depthTex);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width, height);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC,GL_LESS);
-
-    //Assign the shadow map to texture unit 0 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, depthTex);
-
-    //Create and set up the FBO 
-    glGenFramebuffers(1, &shadowFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D, depthTex, 0);
-    GLenum drawBuffers[] = { GL_NONE };
-    glDrawBuffers(1, drawBuffers);
-
-    //빛 입장에서 그려
-    //텍스쳐에 들어감
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, GLHelper::width, GLHelper::height);
-    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    //glEnable(GL_FRONT_FACE);
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(2.5f, 10.0f);
-   // UpdateUniforms_Draw(wall, Lightproj * Lightview * wall.selfMat);
+    float metalRough = 0.43f;
 
     ComputeViewProjMats();
-    UpdateUniforms_Draw(base, Lightproj * Lightview * base.selfMat);
+    //UpdateUniforms_Draw(base, Lightproj * Lightview * base.selfMat, Lightview* base.selfMat);
+    //  DrawMetal(metalRough, 1);
+    //for (int i = 0; i < NUM_MESHES-1; ++i)
+    //{
+    //    if (GLHelper::animated || eyeMoved || resized)
+    //        partMVPMat[i] = Lightproj * Lightview * transformMat[i] * part[i].selfMat;
+    //    /*  Send each part's data to shaders for rendering */
+    //    UpdateUniforms_Draw(part[i], Lightproj * Lightview * part[i].selfMat, Lightview * part[i].selfMat);
+    //}
 
-    for (int i = 0; i < NUM_MESHES-1; ++i)
-    {
-        if (GLHelper::animated || eyeMoved || resized)
-            partMVPMat[i] = Lightproj * Lightview * transformMat[i] * part[i].selfMat;
 
-        /*  Send each part's data to shaders for rendering */
-        UpdateUniforms_Draw(part[i], Lightproj * Lightview * part[i].selfMat);
-
-    }
-
-    // Revert to the default framebuffer for now
-   // glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFlush();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //카메라입장에서 그려
-    //텍스쳐 세팅완료
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, GLHelper::width, GLHelper::height);
-    glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass2Index);
-    
-    ComputeViewProjMats();
 
 	//glUniformMatrix3fv(shadowLoc, 1, GL_FALSE, ValuePtr(vpMat));
 
     /*  Send the floor data to shaders for rendering */
    // UpdateUniforms_Draw(wall, wallMVPMat);
-    UpdateUniforms_Draw(base, baseMVPMat);
+    UpdateUniforms_Draw(base, baseMVPMat, baseMVMat);
+
+    DrawMetal(metalRough, 1);
 
     for (int i = 0; i < NUM_MESHES-1; ++i)
     {
@@ -492,7 +393,7 @@ void Render()
             UpdateTransform(i);
 
         /*  Send each part's data to shaders for rendering */
-        UpdateUniforms_Draw(part[i], partMVPMat[i]);
+        UpdateUniforms_Draw(part[i], partMVPMat[i], partMVMat[i]);
         
     }
 
@@ -501,4 +402,13 @@ void Render()
     resized = false;
 
     shdr_pgm.UnUse();
+}
+
+void DrawMetal( float rough, int metal,  glm::vec3 color)
+{
+   
+    shdr_pgm.SetUniform("Material.Rough", rough);
+    shdr_pgm.SetUniform("Material.Metal", metal);
+    shdr_pgm.SetUniform("Material.Color", color);
+    
 }
