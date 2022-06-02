@@ -3,7 +3,7 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 6) out;
 
-uniform float sin;
+uniform float shrink = 1.0f;
 
 in vec3 NRM[];
 in vec4 vColor[];
