@@ -182,7 +182,7 @@ void GLHelper::key_cb(GLFWwindow *pwin, int key, int scancode, int action, int m
           currRenderMode = NORMAL; // COLOR
           /*  Draw filled triangles and enable back-face culling */
           glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-          glEnable(GL_CULL_FACE);
+          //glEnable(GL_CULL_FACE);
           break;
 
       case COLOR:
