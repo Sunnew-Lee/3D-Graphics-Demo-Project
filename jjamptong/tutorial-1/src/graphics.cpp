@@ -76,7 +76,8 @@ const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 GLuint renderProg;
 
 /*  Locations of the variables in the shader */
-GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc;
+GLint sin_valLoc, colorLoc, mvpMatLoc, modelLoc, shrinkLoc;
+float shrink = 0.9f;
 
 GLSLShader shdr_pgm;
 
@@ -179,20 +180,20 @@ void SendVertexData(Mesh &mesh)
 void ComputeViewProjMats()
 {
     /*  Update view transform matrix */
-    if (eyeMoved)
+    //if (eyeMoved)
         viewMat = LookAtOrigin(1.0f * eyeRadius, ONE_STEP * eyeAlpha, ONE_STEP * eyeBeta);
 
     /*  Update projection matrix */
-    if (resized)
+    //if (resized)
         projMat = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
 
     /*  Update view/projection-related matrices for non-animating objects */
-    if (eyeMoved || resized)
-    {
+   // if (eyeMoved || resized)
+    //{
         vpMat = projMat * viewMat;
         baseMVPMat = vpMat * base.selfMat;
         //wallMVPMat = vpMat * wall.selfMat;
-    }
+  //  }
 }
 
 
@@ -218,6 +219,7 @@ void SetUp()
     modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
     sin_valLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "sin");
+    shrinkLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "shrink");
     
     ComputeViewProjMats();
 
@@ -420,24 +422,15 @@ void Render()
     case GLHelper::FARTHER:MoveFarther(); GLHelper::currCameraMode = GLHelper::IDLE; break;
     }
 
+    
+
+    ImGui::SliderInt("Depth", &eyeRadius, 1, 64);
+    ImGui::SliderFloat("Shrink", &shrink,0.00f, 2.00f);
+    glUniform1f(shrinkLoc, shrink);
     ComputeViewProjMats();
-
-    /*  Send the floor data to shaders for rendering */
-    //UpdateUniforms_Draw(wall, wallMVPMat);
-
-    //glUniform1f(sin_valLoc, glm::sin(static_cast<float>(clock())*0.5));
-
 
     UpdateUniforms_Draw(base, baseMVPMat);
     
-
-    //for (int i = 0; i < 1; ++i)
-    //{
-    //    if (GLHelper::animated || eyeMoved || resized)
-    //        UpdateTransform(i)
-    //    /*  Send each part's data to shaders for rendering */
-    //    UpdateUniforms_Draw(part[i], partMVPMat[i]);
-    //}
 
     /*  Reset */
     eyeMoved = false;

@@ -5,6 +5,7 @@ layout (triangle_strip, max_vertices = 6) out;
 
 //uniform float sin;
 //uniform mat3 rotate;
+uniform float shrink;
 uniform float rotf;
 uniform mat4 mvpMat;
 in vec3 NRM[];
@@ -40,22 +41,20 @@ void main(void)
     Verts[0] = mvpMat *(gl_in[0].gl_Position+ gl_in[1].gl_Position + gl_in[2].gl_Position)/3;
     //Verts[0].y += 5.0;
     //Verts[0].z += sin;wswsdaw
-    gl_Position =( Verts[0] + vec4(0,5,0,0)) ;
+    gl_Position =( Verts[0] + vec4(0,5 + shrink,0,0)) ;
     Verts[0].x = Verts[0].x + (random2d(vec2(cos(gl_in[0].gl_Position.y),sin(gl_in[0].gl_Position.x)))-0.5)*2 ;
     EmitVertex();
 
     gColor = teColor[0];
     gl_Position = Verts[0];
-    gl_Position.x += random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) *0.75 ;   
+    gl_Position.x += random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) * 0.25 ;   
     EmitVertex();
 
     gl_Position = Verts[0];
-    gl_Position.x -= random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) * 0.75;
+    gl_Position.x -= random2d(vec2(cos(gl_in[0].gl_Position.x),sin(gl_in[0].gl_Position.x))) * 0.25;
     EmitVertex();
-
-    // vec3 vc = gl_in[1].gl_Position.xyz -  gl_in[0].gl_Position.xyz;
-    // gl_Position.xyz +=  rotate(30)  * vc;
-    // EmitVertex();
+    
+    EmitVertex();
     
 
     EndPrimitive();
