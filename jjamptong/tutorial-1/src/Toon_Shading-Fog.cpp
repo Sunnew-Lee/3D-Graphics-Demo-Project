@@ -58,6 +58,7 @@ void Toon_Fog::update(double delta_time) {
 
 	camera->eyeMoved = false;
 	camera->resized = false;
+
 }
 
 void Toon_Fog::draw() {

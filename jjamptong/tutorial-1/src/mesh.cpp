@@ -652,6 +652,7 @@ void Mesh::setup_mesh()
     mvpMatLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "mvpMat");
     modelLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "Model");
     colorLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "color");
+    lightPosLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "u_light");
     sin_valLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "sin");
     shrinkLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "shrink");
     centerLoc = glGetUniformLocation(shdr_pgm.GetHandle(), "center");
@@ -751,7 +752,7 @@ void Mesh::draw(/*glm::vec3 color ,glm::mat4 view, glm::mat4 projection, glm::ve
 
 
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, ValuePtr(glm::translate(selfMat, position)));
-
+    glUniform3fv(lightPosLoc, 1, ValuePtr(lightPos));
     glUniform1f(shrinkLoc, shrink);
     glUniform1f(centerLoc, center);
     glUniform1f(heightLoc, grassHeight);
