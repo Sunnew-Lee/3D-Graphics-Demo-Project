@@ -52,26 +52,26 @@ Note that we will be grading from the GitHub repo and we are using the 7z copy a
 
 ## Rubric
 
-- [ ] [**core**] All topics are implemented by students
-- [ ] [**core**] Demo has a scene that demonstrates **Procedural Geometric Modeling** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Toon / Cell Shading** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Fog** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Value noise** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Gradient noise / Perlin noise** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Hermite Curves / Catmull-Rom Splines** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Geometry and Tessellation Shaders** with tweakable parameters
-- [ ] [**core**] Demo has a scene that demonstrates **Shadow Mapping** with tweakable parameters
-- [ ] [**core**] Demo is implemented with OpenGL or an equivalent that allows graphics hardware acceleration 
-- [ ] Demo has an intuitive way to select a topic to view
-- [ ] Created a **Helpful** `ReadMe.md` file that explains how to build the project(s), run the project(s), and how to interact with the project(s).
-- [ ] An equal distribution of work can easily be seen by viewing the commit history
-- [ ] All commit comments and/or pull request merges include a check-in buddy from someone else on the team
-- [ ] All source files compile without warnings and without errors.
-- [ ] Correct files submitted. No unnecessary files submitted.
-- [ ] A 7z archive of the project is created and submitted on the course site
-- [ ] 7z archive includes pre-built binaries that can be run right away
-- [ ] All source files have a proper header comment with your name, assignment name/number, course name, term.
-- [ ] Followed the appropriate Code Quality Guidelines and Code Style Guidelines.
+- [x] [**core**] All topics are implemented by students
+- [x] [**core**] Demo has a scene that demonstrates **Procedural Geometric Modeling** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Toon / Cell Shading** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Fog** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Value noise** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Gradient noise / Perlin noise** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Hermite Curves / Catmull-Rom Splines** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Geometry and Tessellation Shaders** with tweakable parameters
+- [x] [**core**] Demo has a scene that demonstrates **Shadow Mapping** with tweakable parameters
+- [x] [**core**] Demo is implemented with OpenGL or an equivalent that allows graphics hardware acceleration 
+- [x] Demo has an intuitive way to select a topic to view
+- [x] Created a **Helpful** `ReadMe.md` file that explains how to build the project(s), run the project(s), and how to interact with the project(s).
+- [x] An equal distribution of work can easily be seen by viewing the commit history
+- [] All commit comments and/or pull request merges include a check-in buddy from someone else on the team
+- [] All source files compile without warnings and without errors.
+- [x] Correct files submitted. No unnecessary files submitted.
+- [x] A 7z archive of the project is created and submitted on the course site
+- [x] 7z archive includes pre-built binaries that can be run right away
+- [x] All source files have a proper header comment with your name, assignment name/number, course name, term.
+- [x] Followed the appropriate Code Quality Guidelines and Code Style Guidelines.
 
 
 Scores for Assignments will be given as the following:
