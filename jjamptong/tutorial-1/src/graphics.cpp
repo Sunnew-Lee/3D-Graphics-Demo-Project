@@ -68,7 +68,7 @@ const Vec4 useNormal    = Vec4(-1.0f, -1.0f, -1.0f, 1.0f);
 Mat4  shadowBias = Mat4(0);
 Mat4 Lightview = Mat4(0);
 Mat4 Lightproj = Mat4(0);
-
+float resolutionPercen = 1.f;
 /*  Shader filenames */
 
 GLuint pass1Index, pass2Index;
@@ -420,7 +420,7 @@ void Render()
     GLuint depthTex;
     glGenTextures(1, &depthTex);
     glBindTexture(GL_TEXTURE_2D, depthTex);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width, height);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, width * resolutionPercen, height * resolutionPercen);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
@@ -444,15 +444,33 @@ void Render()
     //빛 입장에서 그려
     //텍스쳐에 들어감
     glClear(GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, GLHelper::width, GLHelper::height);
+    glViewport(0, 0, width * resolutionPercen,height * resolutionPercen);
     glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &pass1Index);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     //glEnable(GL_FRONT_FACE);
     glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(2.5f, 10.0f);
+    
+    glPolygonOffset(2.5f,10.0f);
    // UpdateUniforms_Draw(wall, Lightproj * Lightview * wall.selfMat);
-
+    //ImGui::SliderFloat("Resolution%", &resolutionPercen, 1.f, 4.f);
+    ImGui::Text("Resolution"); ImGui::SameLine(85);
+	if(ImGui::Button("Low"))
+    {
+        resolutionPercen = 1.f;
+    }ImGui::SameLine(125);
+    if(ImGui::Button("Medium"))
+    {
+        resolutionPercen = 2.f;
+    }ImGui::SameLine(182);
+    if (ImGui::Button("High"))
+    {
+        resolutionPercen = 3.f;
+    }ImGui::SameLine(225);
+    if (ImGui::Button("Very high"))
+    {
+        resolutionPercen = 4.f;
+    }
     ComputeViewProjMats();
     UpdateUniforms_Draw(base, Lightproj * Lightview * base.selfMat);
 

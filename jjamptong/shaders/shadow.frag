@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-uniform vec3 fogColor = vec3(0.5, 0.5, 0.5);
+uniform vec3 fogColor = vec3(1.0, 1.0, 1.0);
 uniform vec3 u_lightColor = vec3(1.0, 1.0, 1.0);
 uniform float u_ambient = 0.5;
 uniform vec4 color;
@@ -45,7 +45,6 @@ void shadeWithShadow() {
  
   // Do the shadow-map look-up 
   float shadow = textureProj(ShadowMap, ShadowCoord); 
- 
   // If the fragment is in shadow, use ambient light only. 
     outColor = vec4((diffSpec * shadow + ambient) * color.xyz , 1.0); 
     outColor = mix(vec4(fogColor,1.),outColor,1.0);   /* Use obj's color as usual */
