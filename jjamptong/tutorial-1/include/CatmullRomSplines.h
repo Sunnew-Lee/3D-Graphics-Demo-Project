@@ -1,9 +1,11 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 #pragma once
 #include <glslshader.h>
 #include <GLDemo.h>
 #include <vector>
-
-//class IG;
 
 class CatmullRomSplines : public GLDemo
 {
@@ -18,19 +20,19 @@ public:
 private:
 	void setup_shdrpgm();
 	void setup_vao();
+	void add_vao();
 	void update_vao();
-	GLuint vaoid;
-	GLuint vboid;
+	GLuint vaoid = 0;
+	GLuint vboid = 0;
 
 	GLSLShader shdr_pgm;
 	std::vector<glm::vec2> pos_vtx;
-	//void vert_update(glm::vec2 P0, glm::vec2 P1, int count);
-	void calc_vert();
-	int curve_count = 2;
-	bool is_clicked = false;
-	
-	int index{ 0 };
+	std::vector<glm::vec2> moveable_vrx{ 
+		glm::vec2(-0.5f, -0.5f),glm::vec2(-0.5f, 0.0f),glm::vec2(0.5f, 0.0f),glm::vec2(0.5f, 0.5f)
+	};
 
-	glm::vec2 P3Position;
-	//IG* imgui;
+	int curve_count{ 1 };
+	bool is_clicked = false;
+	int VERT_NUM = 4;
+	int index{ 0 };
 };

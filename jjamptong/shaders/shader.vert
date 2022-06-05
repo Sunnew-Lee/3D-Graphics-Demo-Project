@@ -1,21 +1,21 @@
-#version 330 core
+#version 450 core
 
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 nrm;
 layout (location = 2) in vec2 uv;
 
-uniform mat4 mvpMat;
-uniform mat4 Model;
 
-out vec2 UV;
+uniform vec4 color;
+
 out vec3 NRM;
-out vec3 frag_pos;
+out vec4 vColor;
+out vec3 vPosition;
 
 void main(void) 
 {
-    gl_Position = mvpMat * vec4(pos, 1.0);
-    frag_pos = vec3(Model * vec4(pos, 1.0));
+ 
 
-    UV = uv;
-    NRM = mat3(transpose(inverse(Model))) * nrm;
+    NRM = nrm;
+    vColor = color;
+    vPosition =   vec3(vec4(pos,1));
 }

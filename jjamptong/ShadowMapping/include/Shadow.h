@@ -1,13 +1,18 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 #pragma once
+
 #include <GLDemo.h>
 
 //class IG;
 
-class P_Modeling : public GLDemo
+class Shadow : public GLDemo
 {
 public:
-	P_Modeling() {};
-	~P_Modeling() override {};
+	Shadow() {};
+	~Shadow() override {};
 
 	void init() override;
 	void update(double delta_time) override;

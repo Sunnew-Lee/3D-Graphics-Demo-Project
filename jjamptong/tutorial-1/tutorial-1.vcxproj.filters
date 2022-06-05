@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\glapp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\glhelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,16 +33,10 @@
     <ClInclude Include="include\mesh.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\graphics.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\object.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\input.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Procedural_Modeling.h">
+    <ClInclude Include="include\Model_demo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Toon_Shading-Fog.h">
@@ -68,9 +59,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\glapp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\glhelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,13 +74,10 @@
     <ClCompile Include="src\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Procedural_Modeling.cpp">
+    <ClCompile Include="src\Model_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Toon_Shading-Fog.cpp">

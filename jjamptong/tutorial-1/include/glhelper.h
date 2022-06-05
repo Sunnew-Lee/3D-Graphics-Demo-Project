@@ -52,16 +52,16 @@ struct GLHelper
   static GLFWwindow *ptr_window;
 
   /*  For toggling between different rendering modes, need access from input.cpp */
-  enum RenderMode { COLOR, NORMAL, WIREFRAME };
+  enum class RenderMode { COLOR, NORMAL, WIREFRAME };
   static RenderMode currRenderMode;
 
-  enum CameraMode { IDLE, UP, DOWN, LEFT, RIGHT, CLOSER, FARTHER };
+  enum class CameraMode { IDLE, UP, DOWN, LEFT, RIGHT, CLOSER, FARTHER };
   static CameraMode currCameraMode;
-  static GLboolean animated;
-  static GLboolean justAnimated;
   static GLboolean mouseClicked;
   static glm::vec2 mouse_pos;
   static glm::vec2 world_mouse_pos;
+ // static GLboolean animated;
+  //static GLboolean justAnimated;
 };
 
 #endif /* GLHELPER_H */

@@ -1,43 +1,56 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 #include <CatmullRomSplines.h>
-#include <IG.h>
-#include <vector>
-static int VERT_NUM = 4;
+
 void CatmullRomSplines::init() 
 {
-	P3Position = glm::vec2(0.5f, 0.0f);
 	glViewport(0, 0, GLHelper::width, GLHelper::height);
 
 	setup_shdrpgm();
 	setup_vao();
-	IG::init();
 }
 
-void CatmullRomSplines::update(double delta_time)
+void CatmullRomSplines::update([[maybe_unused]] double delta_time)
 {
-	IG::update();
-
 	if (ImGui::SliderInt("addVertex", &VERT_NUM, 4, 12))
 	{
 		pos_vtx.clear();
-		setup_shdrpgm();
+		pos_vtx.resize((VERT_NUM + 2) * curve_count);
+		update_vao();
+	}
+
+	if (ImGui::Button("addLine"))
+	{
+		moveable_vrx.push_back({ 0,0 });
+		add_vao();
+	}
+
+	if (ImGui::Button("Clear"))
+	{
+		cleanup();
+		moveable_vrx.clear();
+		moveable_vrx.push_back(glm::vec2(-0.5f, -0.5f));
+		moveable_vrx.push_back(glm::vec2(-0.5f, 0.0f));
+		moveable_vrx.push_back(glm::vec2(0.5f, 0.0f));
+		moveable_vrx.push_back(glm::vec2(0.5f, 0.5f));
+		pos_vtx.clear();
+		VERT_NUM = 4;
+		curve_count = 1;
+
 		setup_vao();
 	}
 
-	if (GLHelper::mouseClicked == true)
+	if (GLHelper::mouseClicked == GL_TRUE)
 	{
-		int size = pos_vtx.size();
-		for (int i{ 0 }; i < size; i += VERT_NUM)
+		int size = static_cast<int>(moveable_vrx.size());
+		for (int i{ 0 }; i < size; i++)
 		{
-			if (abs(GLHelper::mouse_pos.x - pos_vtx[i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[i].y) < 0.05f)
+			if (abs(GLHelper::mouse_pos.x - moveable_vrx[i].x) < 0.05f && abs(GLHelper::mouse_pos.y - moveable_vrx[i].y) < 0.05f)
 			{
 				is_clicked = true;
 				index = i;
-				break;
-			}
-			else if (abs(GLHelper::mouse_pos.x - pos_vtx[1 + i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[1 + i].y) < 0.05f)
-			{
-				is_clicked = true;
-				index = i + 1;
 				break;
 			}
 		}
@@ -49,15 +62,7 @@ void CatmullRomSplines::update(double delta_time)
 		{
 			is_clicked = false;
 		}
-		for (int i{ 0 }; i < curve_count; i++)
-		{
-			if (index <= 1 || index >= VERT_NUM)
-			{
-				//calc_vert(VERT_NUM);
-				pos_vtx[index] = GLHelper::mouse_pos;
-				calc_vert();
-			}
-		}
+		moveable_vrx[index] = GLHelper::mouse_pos;
 		update_vao();
 	}
 	
@@ -65,7 +70,7 @@ void CatmullRomSplines::update(double delta_time)
 
 void CatmullRomSplines::draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shdr_pgm.Use();
 	glBindVertexArray(vaoid);
@@ -73,40 +78,41 @@ void CatmullRomSplines::draw()
 	glLineWidth(3.f);
 
 	glVertexAttrib3f(9, 0.f, 0.f, 1.f); // blue color for lines
-	glDrawArrays(GL_LINE_STRIP, 1, (VERT_NUM));
 
-	//glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for vectors
-	//glDrawArrays(GL_LINE_STRIP, 0, 2);	//first two node
-	//glDrawArrays(GL_LINE_STRIP, (VERT_NUM - 1), 2);//last two node
+	int size_in_one_curve = VERT_NUM + 2;
+
+	for (int i{ 0 }; i < curve_count; i++)
+	{
+		glDrawArrays(GL_LINE_STRIP, 1 + size_in_one_curve * i, (VERT_NUM));
+	}
 
 	glLineWidth(1.f);
 
 	glPointSize(10.f);
 	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for points
-	glDrawArrays(GL_POINTS, 0, 1);
-	glDrawArrays(GL_POINTS, VERT_NUM+1, 1);
 
-	glVertexAttrib3f(9, 1.f, 0.0f, 0.f); // red color for points
-	glDrawArrays(GL_POINTS, 1, pos_vtx.size()-2);
+	for (int i{ 0 }; i < curve_count; i++)
+	{
+		glDrawArrays(GL_POINTS, size_in_one_curve * i, 2);
+		glDrawArrays(GL_POINTS, VERT_NUM + (size_in_one_curve * i), 2);
+	}
+
 	glPointSize(1.f);
 
 	glBindVertexArray(0);
 
 	shdr_pgm.UnUse();
-
-	IG::draw();
 }
 
 void CatmullRomSplines::cleanup()
 {
-	IG::cleanup();
 }
 
 void CatmullRomSplines::setup_shdrpgm()
 {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
-	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
-	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
+	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/curve.vert"));
+	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/curve.frag"));
 	shdr_pgm.CompileLinkValidate(shdr_files);
 	if (GL_FALSE == shdr_pgm.IsLinked()) {
 		std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -117,10 +123,10 @@ void CatmullRomSplines::setup_shdrpgm()
 
 void CatmullRomSplines::setup_vao()
 {
-	glm::vec2 P0 = glm::vec2(-0.5f, -0.5f);
-	glm::vec2 P1 = glm::vec2(-0.5f, 0.0f);	//start
-	glm::vec2 P2 = P3Position;	//end
-	glm::vec2 P3 = glm::vec2(0.5f, 0.5f);
+	glm::vec2 P0 = moveable_vrx[0];
+	glm::vec2 P1 = moveable_vrx[1];
+	glm::vec2 P2 = moveable_vrx[2];
+	glm::vec2 P3 = moveable_vrx[3];
 
 	pos_vtx.push_back(P0);
 
@@ -154,12 +160,31 @@ void CatmullRomSplines::setup_vao()
 
 }
 
-void CatmullRomSplines::update_vao()
+void CatmullRomSplines::add_vao()
 {
+	glm::vec2 P0 = moveable_vrx[curve_count];
+	glm::vec2 P1 = moveable_vrx[curve_count + 1];
+	glm::vec2 P2 = moveable_vrx[curve_count + 2];
+	glm::vec2 P3 = moveable_vrx[curve_count + 3];
+	curve_count++;
 
-	glCreateVertexArrays(1, &vaoid);
-	glGenBuffers(1, &vboid);
+	pos_vtx.push_back(P0);
 
+	for (int i{ 0 }; i <= VERT_NUM - 1; i++)
+	{
+		float u = (1.f / (VERT_NUM - 1) * i);
+		float u_cube = u * u * u;
+		float u_square = u * u;
+
+		glm::vec2 temp =
+			(-1.f / 2.f * u_cube + u_square - 1.f / 2.f * u) * P0 + (3.f / 2.f * u_cube - 5.f / 2.f * u_square + 1.f) * P1
+			+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * P2 + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * P3;
+
+		pos_vtx.push_back(temp);
+	}
+
+	pos_vtx.push_back(P3);
+	
 	glBindVertexArray(vaoid);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid);
 
@@ -171,28 +196,42 @@ void CatmullRomSplines::update_vao()
 	glBindVertexArray(0);
 }
 
-//void CatmullRomSplines::vert_update(glm::vec2 P0, glm::vec2 P1, int count)
-//{
-//}
-//	
-
-void CatmullRomSplines::calc_vert()
+void CatmullRomSplines::update_vao()
 {
-	//VERT_NUM++;
-	//P3Position = { GLHelper::world_mouse_pos.x,GLHelper::world_mouse_pos.y };
-	glm::vec2 P1 = pos_vtx[1];
-	glm::vec2 P2 = pos_vtx[VERT_NUM];
-	
-	for (int i{ 0 }; i <= VERT_NUM-1; i++)
+	for (int j{ 0 }; j < curve_count; j++)
 	{
-		float u = (1.f / (VERT_NUM - 1) * i);
-		float u_cube = u * u * u;
-		float u_square = u * u;
+		glm::vec2 P0 = moveable_vrx[j];
+		glm::vec2 P1 = moveable_vrx[j + 1];
+		glm::vec2 P2 = moveable_vrx[j + 2];
+		glm::vec2 P3 = moveable_vrx[j + 3];
 
-		glm::vec2 temp =
-			(-1.f / 2.f * u_cube + u_square - 1.f / 2.f * u) * pos_vtx[0] + (3.f / 2.f * u_cube - 5.f / 2.f * u_square + 1.f) * P1
-			+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * P2 + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * pos_vtx[VERT_NUM+1];
+		int stride = (VERT_NUM + 2) * j;
 
-		pos_vtx[i + 1] = temp;
+		pos_vtx[stride] = P0;
+		pos_vtx[VERT_NUM + 1 + stride] = P3;
+
+		for (int i{ 0 }; i <= VERT_NUM - 1; i++)
+		{
+			float u = (1.f / (VERT_NUM - 1) * i);
+			float u_cube = u * u * u;
+			float u_square = u * u;
+			
+
+			glm::vec2 temp =
+				(-1.f / 2.f * u_cube + u_square - 1.f / 2.f * u) * pos_vtx[stride] + (3.f / 2.f * u_cube - 5.f / 2.f * u_square + 1.f) * P1
+				+ (-3.f / 2.f * u_cube + 2.f * u_square + 1.f / 2.f * u) * P2 + (1.f / 2.f * u_cube - 1.f / 2.f * u_square) * pos_vtx[VERT_NUM + 1 + stride];
+
+			pos_vtx[(i + 1) + stride] = temp;
+		}
 	}
+
+	glBindVertexArray(vaoid);
+	glBindBuffer(GL_ARRAY_BUFFER, vboid);
+
+	glBufferData(GL_ARRAY_BUFFER, pos_vtx.size() * sizeof(glm::vec2), pos_vtx.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(8);
+	glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+
+	glBindVertexArray(0);
 }

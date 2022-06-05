@@ -1,11 +1,15 @@
-#include <Procedural_Modeling.h>
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
+#include <Shadow.h>
 #include <IG.h>
 #include <graphics.hpp>
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
 //static GLNew    g_glnew;
 
-void P_Modeling::init() {
+void Shadow::init() {
 	glClearColor(1.f, 0.f, 0.f, 1.f);
 
 	SetUp();
@@ -25,21 +29,22 @@ void P_Modeling::init() {
 	IG::init();
 }
 
-void P_Modeling::update(double delta_time) {
+void Shadow::update(double delta_time) {
 	//glClearColor(0.f,0.f, 0.f, 1.f);
+	IG::update();
+
 	Render();
 
-	IG::update();
 }
 
-void P_Modeling::draw() {
+void Shadow::draw() {
 	//glClear(GL_COLOR_BUFFER_BIT);
 
 	//mdl.draw();
 	IG::draw();
 }
 
-void P_Modeling::cleanup() {
+void Shadow::cleanup() {
 	// empty for now
 	IG::cleanup();
 }

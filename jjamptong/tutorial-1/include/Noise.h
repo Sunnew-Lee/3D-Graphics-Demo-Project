@@ -1,54 +1,34 @@
-#pragma once
-#include <vector>
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 
+#pragma once
 #include <GL/glew.h> // for access to OpenGL API declarations 
 #include <GLFW/glfw3.h>
-#include "glslshader.h"
+#include <glslshader.h>
+#include <glDemo.h>
 
-template<typename T>
-class Vec2
-{
-public:
-    Vec2() : x(T(0)), y(T(0)) {}
-    Vec2(T xx, T yy) : x(xx), y(yy) {}
-    Vec2 operator * (const T& r) const { return Vec2(x * r, y * r); }
-    T x, y;
-};
-
-typedef Vec2<float> Vec2f;
-
-template<typename T = float>
-inline T lerp(const T& lo, const T& hi, const T& t)
-{
-    return lo * (1 - t) + hi * t;
-}
-
-inline float smoothstep(const float& t) { return t * t * (3 - 2 * t); }
-
-inline
-float quintic(const float& t)
-{
-    return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-inline
-float quinticDeriv(const float& t)
-{
-    return 30 * t * t * (t * (t - 2) + 1);
-}
-
-class ValueNoise
+class ValueNoise : public GLDemo
 {
 public:
     ValueNoise(unsigned seed = 2016);
-    float eval(Vec2f const& p) const;
-    void init();
+    ~ValueNoise() override {};
+
+    void init() override;
+    void update(double delta_time) override;
+    void draw() override;
+    void cleanup() override;
+
+    void vert_setup();
+    void shdr_setup();
+    float eval(glm::vec2 const& p) const;
     void makePPM();
+    void makePPM4Marble();
+    void makePPM4Wood();
+    //void makePPM4Turbulence();
     void mesh_setup();
-    GLuint texture_setup();
-    void draw();
-    void update(double delta_time);
-    void cleanUp();
+    GLuint texture_setup();    
 
 private:
     static const unsigned kMaxTableSize = 256;
@@ -66,4 +46,37 @@ private:
     std::vector<Vertex> vertices;
     unsigned char ptr_texels[256][256 * 3] = { 0 };
     std::vector<GLushort> indices;
+
+    int numLayers = 5;
+    float frequencyMult = 1.8f;
+    float amplitudeMult = 0.35f;
+    enum class VALUE_MODE
+    {
+        VALUE = 0,
+        MARBLE,
+        WOOD,
+        NONE
+    };
+	enum class METHOD_MODE
+    {
+	    SMOOTHSTEP,
+        QUINTIC,
+        NONE
+    };
+
+    const char* items[static_cast<int>(VALUE_MODE::NONE)] = { "Value", "Marble", "Wood" };
+    const char* methods[static_cast<int>(METHOD_MODE::NONE)] = { "SmoothStep", "Quintic" };
+	bool do_once = true;
+
+    mutable float sx = 0.f;
+	mutable float sy = 0.f;
+    
+    GLuint texobj = 0;
+    float frequency = 0.1f;
+    float frequencyMarble = 0.02f;
+    float frequencyWood = 0.01f;
+    int current_item = 0;
+    int current_method = 0;
+    VALUE_MODE curr_mode = VALUE_MODE::VALUE;
+    METHOD_MODE curr_method_mode = METHOD_MODE::QUINTIC;
 };

@@ -1,6 +1,8 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 #include <Hermite_Curve.h>
-#include <IG.h>
-#include <vector>
 
 void Hermite_Curve::init()
 {
@@ -8,109 +10,135 @@ void Hermite_Curve::init()
 
 	setup_shdrpgm();
 	setup_vao();
-	IG::init();
 }
 
-void Hermite_Curve::update(double delta_time)
+void Hermite_Curve::update([[maybe_unused]]double delta_time)
 {
-	IG::update();
-
-	if (GLHelper::mouseClicked == true)
+	if (ImGui::SliderInt("addVertex", &VERT_NUM, 4, 12))
 	{
-		int size = pos_vtx.size();
-		for (int i{ 0 }; i < size; i += VERT_NUM + 1)
+		pos_vtx.clear();
+		pos_vtx.resize((VERT_NUM + 2) * curve_count);
+		update_vao();
+	}
+
+	ImGui::Checkbox("Hide Tangent", (bool*)&hide_tangent);
+
+	if (ImGui::Button("addLine"))
+	{
+		moveable_vrx.push_back({ 0,0 });	//end point
+		moveable_vrx.push_back({ 0,-0.5 });	//end tangent
+		moveable_vrx.push_back({ 0,0 });	//end point
+		add_vao();
+	}
+
+	if (ImGui::Button("Clear"))
+	{
+		cleanup();
+		moveable_vrx.clear();
+		moveable_vrx.push_back(glm::vec2(-0.5f, -0.75f));
+		moveable_vrx.push_back(glm::vec2(-0.5f, 0.0f));
+		moveable_vrx.push_back(glm::vec2(0.5f, 0.0f));
+		moveable_vrx.push_back(glm::vec2(0.5f, -0.75f));
+		moveable_vrx.push_back(glm::vec2(0.5f, 0.0f));
+		pos_vtx.clear();
+		VERT_NUM = 4;
+		curve_count = 1;
+		hide_tangent = false;
+
+		setup_vao();
+	}
+
+	if (GLHelper::mouseClicked == GL_TRUE && is_clicked == false)
+	{
+		int size = static_cast<int>(moveable_vrx.size());
+		for (int i{ 0 }; i < size; i++)
 		{
-			if (abs(GLHelper::mouse_pos.x - pos_vtx[i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[i].y) < 0.05f)
+			if (abs(GLHelper::mouse_pos.x - moveable_vrx[i].x) < 0.05f && abs(GLHelper::mouse_pos.y - moveable_vrx[i].y) < 0.05f)
 			{
 				is_clicked = true;
 				index = i;
-				break;
-			}
-			else if (abs(GLHelper::mouse_pos.x - pos_vtx[1+i].x) < 0.05f && abs(GLHelper::mouse_pos.y - pos_vtx[1+i].y) < 0.05f)
-			{
-				is_clicked = true;
-				index = i + 1;
 				break;
 			}
 		}
 	}
 	if (is_clicked == true)
 	{
-		pos_vtx[index] = GLHelper::mouse_pos;
+
 		if (GLHelper::mouseClicked == false)
 		{
 			is_clicked = false;
 		}
-		for (int i{ 0 }; i < curve_count; i++)
+
+		if (index < moveable_vrx.size() - 2)
 		{
-			if (index >= 0 && index <= 13)
-			{
-				calc_vert(VERT_NUM);
-			}
+			if(moveable_vrx[index] == moveable_vrx[index+2])
+				moveable_vrx[index+2] = GLHelper::mouse_pos;
 		}
+		moveable_vrx[index] = GLHelper::mouse_pos;
+
 		update_vao();
 	}
 
-	//if (ImGui::Button("New Line"))
-	//{
-	//	curve_count++;
-	//	glm::vec2 temp = *(pos_vtx.end() - 1);
-	//	calc_vert(*(pos_vtx.end() - 2), *(pos_vtx.end() - 1), VERT_NUM);
-	//	update_vao();
-	//}
 }
 
 void Hermite_Curve::draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	shdr_pgm.Use();
 	glBindVertexArray(vaoid);
 
-	//for (int i{ 0 }; i < curve_count; i++)
-	//{
-	//	glLineWidth(3.f);
-	//	glVertexAttrib3f(9, 0.f, 0.f, 1.f); // blue color for lines
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i + 1, (VERT_NUM + 1));
-	//	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for vectors
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i, 2);	//pos_vtx[0],pos_vtx[1]
-	//	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 3) * i + (VERT_NUM + 1), 2);	//pos_vtx[11],pos_vtx[12]
-	//	glLineWidth(1.f);
-	//}
-
 	glLineWidth(3.f);
 
 	glVertexAttrib3f(9, 0.f, 0.f, 1.f); // blue color for lines
-	glDrawArrays(GL_LINE_STRIP, 1, (VERT_NUM + 1));
+
+	int size_in_one_curve = VERT_NUM + 2;
+
+	for (int i{ 0 }; i < curve_count; i++)
+	{
+		glDrawArrays(GL_LINE_STRIP, 1 + size_in_one_curve*i, (VERT_NUM));
+	}
 
 	glVertexAttrib3f(9, 0.f, 1.f, 0.f); // green color for vectors
-	glDrawArrays(GL_LINE_STRIP, 0, 2);	//pos_vtx[0],pos_vtx[1]
-	glDrawArrays(GL_LINE_STRIP, (VERT_NUM + 1), 2);	//pos_vtx[11],pos_vtx[12]
+
+	if (hide_tangent == false)
+	{
+		for (int i{ 0 }; i < curve_count; i++)
+		{
+			glDrawArrays(GL_LINE_STRIP, size_in_one_curve * i, 2);	//pos_vtx[0],pos_vtx[1]
+			glDrawArrays(GL_LINE_STRIP, VERT_NUM + (size_in_one_curve * i), 2);	//pos_vtx[11],pos_vtx[12]
+		}
+	}
+
 
 	glLineWidth(1.f);
 
 	glPointSize(10.f);
 	glVertexAttrib3f(9, 1.f, 0.0f, 0.f); // red color for points
-	glDrawArrays(GL_POINTS, 0, pos_vtx.size());
+
+	for (int i{ 0 }; i < curve_count; i++)
+	{
+		glDrawArrays(GL_POINTS, size_in_one_curve * i, 2);	//pos_vtx[0],pos_vtx[1]
+		glDrawArrays(GL_POINTS, VERT_NUM + (size_in_one_curve * i), 2);	//pos_vtx[11],pos_vtx[12]
+	}
+
 	glPointSize(1.f);
 
 	glBindVertexArray(0);
 
 	shdr_pgm.UnUse();
 
-	IG::draw();
 }
 
 void Hermite_Curve::cleanup()
 {
-	IG::cleanup();
 }
 
 void Hermite_Curve::setup_shdrpgm()
 {
 	std::vector<std::pair<GLenum, std::string>> shdr_files;
-	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/CS250_Project.vert"));
-	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/CS250_Project.frag"));
+	shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../shaders/curve.vert"));
+	shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../shaders/curve.frag"));
 	shdr_pgm.CompileLinkValidate(shdr_files);
 	if (GL_FALSE == shdr_pgm.IsLinked()) {
 		std::cout << "Unable to compile/link/validate shader programs" << "\n";
@@ -121,16 +149,16 @@ void Hermite_Curve::setup_shdrpgm()
 
 void Hermite_Curve::setup_vao()
 {
-	glm::vec2 P0 = glm::vec2(-0.5f, 0.0f);
-	glm::vec2 P1 = glm::vec2(0.5f, 0.0f);
-	glm::vec2 P0_p = glm::vec2(P0.x, -0.75f);
-	glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
+	glm::vec2 P0_p = moveable_vrx[0];	//P0 tangent
+	glm::vec2 P0 = moveable_vrx[1];
+	glm::vec2 P1 = moveable_vrx[2];
+	glm::vec2 P1_p = moveable_vrx[3];	//P1 tangent
 
 	pos_vtx.push_back(P0_p);
 
-	for (int i{ 0 }; i <= VERT_NUM; i++)
+	for (int i{ 0 }; i <= VERT_NUM-1; i++)
 	{
-		float u = (1.f / VERT_NUM * i);
+		float u = (1.f / (VERT_NUM-1) * i);
 		float u_cube = u * u * u;
 		float u_square = u * u;
 
@@ -159,9 +187,31 @@ void Hermite_Curve::setup_vao()
 
 void Hermite_Curve::update_vao()
 {
-	//glm::vec2 P0 = glm::vec2(-0.5f, 0.0f);
-	//glm::vec2 P1 = glm::vec2(0.5f, 0.0f);
-	//calc_vert(pos_vtx[1], pos_vtx[11], VERT_NUM);
+	for (int j{ 0 }; j < curve_count; j++)
+	{
+		glm::vec2 P0_p = moveable_vrx[j * 3];
+		glm::vec2 P0 = moveable_vrx[j * 3 + 1];
+		glm::vec2 P1 = moveable_vrx[j * 3 + 2];
+		glm::vec2 P1_p = moveable_vrx[j * 3 + 3];
+
+		int stride = (VERT_NUM + 2) * j;
+
+		pos_vtx[stride] = P0_p;
+		pos_vtx[VERT_NUM + 1 + stride] = P1_p;
+
+		for (int i{ 0 }; i <= VERT_NUM - 1; i++)
+		{
+			float u = (1.f / (VERT_NUM - 1) * i);
+			float u_cube = u * u * u;
+			float u_square = u * u;
+
+			glm::vec2 temp =
+				(2 * u_cube - 3 * u_square + 1) * P0 + (-2 * u_cube + 3 * u_square) * P1
+				+ (u_cube - 2 * u_square + u) * (P0_p - P0) + (u_cube - u_square) * (P1_p - P1);
+
+			pos_vtx[(i + 1) + stride] = temp;
+		}
+	}
 
 	glBindVertexArray(vaoid);
 	glBindBuffer(GL_ARRAY_BUFFER, vboid);
@@ -174,45 +224,37 @@ void Hermite_Curve::update_vao()
 	glBindVertexArray(0);
 }
 
-void Hermite_Curve::vert_update(glm::vec2 P0, glm::vec2 P1, int count)
+void Hermite_Curve::add_vao()
 {
-	//glm::vec2 temp = *(pos_vtx.end() - 2);
-	//glm::vec2 P1 = glm::vec2(temp.x + 0.25f, temp.y);
-	//glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
+	glm::vec2 P0_p = moveable_vrx[curve_count * 3];	//P0 tangent
+	glm::vec2 P0 = moveable_vrx[curve_count * 3 +1];
+	glm::vec2 P1 = moveable_vrx[curve_count * 3 +2];
+	glm::vec2 P1_p = moveable_vrx[curve_count * 3 +3];	//P1 tangent
+	curve_count++;
 
-	//pos_vtx.push_back(P0_p);
+	pos_vtx.push_back(P0_p);
 
-	//for (int i{ 0 }; i <= count; i++)
-	//{
-	//	float u = (1.f / count * i);
-	//	float u_cube = u * u * u;
-	//	float u_square = u * u;
-
-	//	glm::vec2 temp =
-	//		(2 * u_cube - 3 * u_square + 1) * P0 + (-2 * u_cube + 3 * u_square) * P1
-	//		+ (u_cube - 2 * u_square + u) * (P0_p - P0) + (u_cube - u_square) * (P1_p - P1);
-
-	//	pos_vtx.push_back(temp);
-	//}
-	//pos_vtx.push_back(P1_p);
-}
-
-void Hermite_Curve::calc_vert( int count)
-{
-	//glm::vec2 temp = *(pos_vtx.end() - 2);
-	//glm::vec2 P1 = glm::vec2(temp.x + 0.25f, temp.y);
-	//glm::vec2 P1_p = glm::vec2(P1.x, -0.75f);
-
-	for (int i{ 0 }; i <= count; i++)
+	for (int i{ 0 }; i <= VERT_NUM - 1; i++)
 	{
-		float u = (1.f / count * i);
+		float u = (1.f / (VERT_NUM - 1) * i);
 		float u_cube = u * u * u;
 		float u_square = u * u;
 
 		glm::vec2 temp =
-			(2 * u_cube - 3 * u_square + 1) * pos_vtx[1] + (-2 * u_cube + 3 * u_square) * pos_vtx[11]
-			+ (u_cube - 2 * u_square + u) * (pos_vtx[0] - pos_vtx[1]) + (u_cube - u_square) * (pos_vtx[12] - pos_vtx[11]);
+			(2 * u_cube - 3 * u_square + 1) * P0 + (-2 * u_cube + 3 * u_square) * P1
+			+ (u_cube - 2 * u_square + u) * (P0_p - P0) + (u_cube - u_square) * (P1_p - P1);
 
-		pos_vtx[i + 1] = temp;
+		pos_vtx.push_back(temp);
 	}
+	pos_vtx.push_back(P1_p);
+
+	glBindVertexArray(vaoid);
+	glBindBuffer(GL_ARRAY_BUFFER, vboid);
+
+	glBufferData(GL_ARRAY_BUFFER, pos_vtx.size() * sizeof(glm::vec2), pos_vtx.data(), GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(8);
+	glVertexAttribPointer(8, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+
+	glBindVertexArray(0);
 }

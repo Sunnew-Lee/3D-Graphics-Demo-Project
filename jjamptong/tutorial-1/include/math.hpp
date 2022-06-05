@@ -76,7 +76,7 @@ const float  ONE_STEP = PI / NUM_STEPS_PI;
         The resulting scaling matrix
 */
 /******************************************************************************/
-static Mat4 Scale(float sx, float sy, float sz)
+inline Mat4 Scale(float sx, float sy, float sz)
 {
     return glm::scale(Mat4(1.0f), Vec3(sx, sy, sz));
 }
@@ -93,7 +93,7 @@ static Mat4 Scale(float sx, float sy, float sz)
         The resulting scaling matrix
 */
 /******************************************************************************/
-static Mat4 Scale(const Vec3 &s)
+inline Mat4 Scale(const Vec3 &s)
 {
     return glm::scale(Mat4(1.0f), s);
 }
@@ -112,7 +112,7 @@ static Mat4 Scale(const Vec3 &s)
         The resulting rotation matrix
 */
 /******************************************************************************/
-static Mat4 Rotate(float angle, const Vec3 &axis)
+inline Mat4 Rotate(float angle, const Vec3 &axis)
 {
     return glm::rotate(Mat4(1.0f), angle, axis);
 }
@@ -135,7 +135,7 @@ static Mat4 Rotate(float angle, const Vec3 &axis)
         The resulting rotation matrix
 */
 /******************************************************************************/
-static Mat4 Rotate(float angle, float ax, float ay, float az)
+inline Mat4 Rotate(float angle, float ax, float ay, float az)
 {
     return glm::rotate(Mat4(1.0f), angle, Vec3(ax, ay, az));
 }
@@ -156,7 +156,7 @@ static Mat4 Rotate(float angle, float ax, float ay, float az)
         The resulting translation matrix
 */
 /******************************************************************************/
-static Mat4 Translate(float tx, float ty, float tz)
+inline Mat4 Translate(float tx, float ty, float tz)
 {
     return glm::translate(Mat4(1.0f), Vec3(tx, ty, tz));
 }
@@ -173,7 +173,7 @@ static Mat4 Translate(float tx, float ty, float tz)
         The resulting translation matrix
 */
 /******************************************************************************/
-static Mat4 Translate(const Vec3 &t)
+inline Mat4 Translate(const Vec3 &t)
 {
     return glm::translate(Mat4(1.0f), t);
 }
@@ -202,7 +202,7 @@ static Mat4 Translate(const Vec3 &t)
         The resulting perspective projection matrix
 */
 /******************************************************************************/
-static Mat4 Frustum(float leftPlane, float rightPlane, 
+inline Mat4 Frustum(float leftPlane, float rightPlane,
                     float bottomPlane, float topPlane, 
                     float nearPlane, float farPlane)
 {
@@ -225,7 +225,7 @@ static Mat4 Frustum(float leftPlane, float rightPlane,
         The resulting view transformation matrix
 */
 /******************************************************************************/
-static Mat4 LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up)
+inline Mat4 LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up)
 {
     return glm::lookAt(eye, center, up);
 }
@@ -248,9 +248,9 @@ static Mat4 LookAt(const Vec3 &eye, const Vec3 &center, const Vec3 &up)
         The resulting view transformation matrix
 */
 /******************************************************************************/
-static Mat4 LookAtOrigin(float eyeRadius, float eyeAlpha, float eyeBeta)
+inline Mat4 LookAtOrigin(float eyeRadius, float eyeAlpha, float eyeBeta)
 {
-    glm::vec4 position{ eyeRadius, 0.f, 0.f, 1.f };
+    glm::vec4 position{ -eyeRadius, 0.f, 0.f, 1.f };
     glm::vec3 up{ 0.f, 1.f, 0.f };
 
     //Setup rotation matrix to rotate the position around the target
@@ -278,7 +278,7 @@ static Mat4 LookAtOrigin(float eyeRadius, float eyeAlpha, float eyeBeta)
 */
 /******************************************************************************/
 template <typename T>
-static T Normalize(T vec)
+inline T Normalize(T vec)
 {
     return glm::normalize(vec);
 }
@@ -296,7 +296,7 @@ static T Normalize(T vec)
 */
 /******************************************************************************/
 template <typename T>
-static float const* ValuePtr(T const& value)
+inline float const* ValuePtr(T const& value)
 {
     return glm::value_ptr(value);
 }
@@ -313,7 +313,7 @@ static float const* ValuePtr(T const& value)
         The rounded value
 */
 /******************************************************************************/
-static float RoundDecimal(float input)
+inline float RoundDecimal(float input)
 {
     return std::floor(input * 10000.0f + 0.5f) / 10000.0f;
 }
@@ -330,7 +330,7 @@ static float RoundDecimal(float input)
         The vector with rounded values
 */
 /******************************************************************************/
-static Vec3 RoundDecimal(const Vec3 &input)
+inline Vec3 RoundDecimal(const Vec3 &input)
 {
     return Vec3(RoundDecimal(input[0]), RoundDecimal(input[1]), RoundDecimal(input[2]));
 }
@@ -347,7 +347,7 @@ static Vec3 RoundDecimal(const Vec3 &input)
         The vector with rounded values
 */
 /******************************************************************************/
-static Vec4 RoundDecimal(const Vec4 &input)
+inline Vec4 RoundDecimal(const Vec4 &input)
 {
     return Vec4(RoundDecimal(input[0]), RoundDecimal(input[1]), RoundDecimal(input[2]), RoundDecimal(input[3]));
 }
@@ -369,12 +369,32 @@ static Vec4 RoundDecimal(const Vec4 &input)
         Whether the triangle is degenerate
 */
 /******************************************************************************/
-static bool DegenerateTri(const Vec3 &v0, const Vec3 &v1, const Vec3 &v2)
+inline bool DegenerateTri(const Vec3 &v0, const Vec3 &v1, const Vec3 &v2)
 {
     return (glm::distance(v0, v1) < EPSILON ||
             glm::distance(v1, v2) < EPSILON ||
             glm::distance(v2, v0) < EPSILON);
 }
 
+template<typename T = float>
+inline T lerp(const T& lo, const T& hi, const T& t)
+{
+    return lo * (1 - t) + hi * t;
+}
+
+inline float smoothstep(const float& t)
+{
+    return t * t * (3 - 2 * t);
+}
+
+inline float quintic(const float& t)
+{
+    return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+inline float quinticDeriv(const float& t)
+{
+    return 30 * t * t * (t * (t - 2) + 1);
+}
 
 #endif

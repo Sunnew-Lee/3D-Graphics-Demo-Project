@@ -1,13 +1,10 @@
+// Dong-A Choi, Sunwoo Lee
+// CS250 Class Project
+// CS250
+// 2022 spring
 #include <IG.h>
 
 #include <glhelper.h>
-
-//#include "object.hpp"
-
-
-bool show_demo_window = false;
-bool show_another_window = false;
-ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
 
 
 
@@ -27,58 +24,78 @@ void IG::init()
 void IG::update()
 {
     // ¿¹½Ã Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-    {
-        static float f = 0.0f;
-        static int counter = 0;
+	ImGui::Begin("Class Project");
 
-        ImGui::Begin("Test Menu");                          // Create a window called "Hello, world!" and append into it.
+	
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+	//if (ImGui::BeginMenu("Credit"))
+	//{
+	//	if (ImGui::MenuItem("Close"))
+	//	{
+	//		ImGui::EndMenu();
+	//	}
+	//	else
+	//	{
+	//		ImGui::Text("Team: jjamptong");
+	//		ImGui::Text("Members: sunwoo.lee / dong-a.choi");
+	//	}
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	//}
+	ImGui::Text("Team: jjamptong");
+	ImGui::Text("Members: sunwoo.lee / dong-a.choi");
 
-    	ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+	ImGui::NewLine();
+	float framerate = ImGui::GetIO().Framerate;
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.f / framerate, framerate);
 
-        //ImGui::ColorEdit3("Torus color", (float*)&Torus_color);
+	ImGui::NewLine();
+	ImGui::ColorEdit3("background color", (float*)&clear_color); // Edit 3 floats representing a color
+	ImGui::Checkbox("Togle WireFrame", (bool*)&is_wireframe);
 
-        ImGui::End();
-    }
+	if(is_wireframe == true)
+	{
+		GLHelper::currRenderMode = GLHelper::RenderMode::WIREFRAME;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDisable(GL_CULL_FACE);
 
-    // 3. Show another simple window.
-    if (show_another_window)
-    {
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Choose another Demo!");
+	}
+	else
+	{
+		GLHelper::currRenderMode = GLHelper::RenderMode::NORMAL;
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDisable(GL_CULL_FACE);
+	}
 
-        if(ImGui::Button("RGB"))
-        {
-	        
-        }
-        if(ImGui::Button("White"))
-        {
-	        
-        }
-        if (ImGui::Button("Close Me")) {
-            show_another_window = false;
-        }
-        ImGui::End();
-    }
+	ImGui::NewLine();
+	if(ImGui::Combo("Demos", &selectedItem, items, IM_ARRAYSIZE(items)))
+	{
+		switch (selectedItem)
+		{
+		case 0:curr_demo = DEMOS::MODEL; break;
+		case 1:curr_demo = DEMOS::TOON; break;
+		case 2:curr_demo = DEMOS::VALUE; break;
+		case 3:curr_demo = DEMOS::PERLIN; break;
+		case 4:curr_demo = DEMOS::TERRAIN; break;
+		case 5:curr_demo = DEMOS::HERMITE; break;
+		case 6:curr_demo = DEMOS::CATMULL; break;
+		//case 7:curr_demo = DEMOS::GEOM; break;
+		//case 8:curr_demo = DEMOS::SHADOW; break;
+
+		default: curr_demo = DEMOS::MODEL; break;
+		}
+	}
+
+	ImGui::End();
 }
 
 void IG::draw()
 {
-    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    
     
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -88,4 +105,14 @@ void IG::cleanup()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+void IG::Set_state(DEMOS next_demo)
+{
+    curr_demo = next_demo;
+}
+
+IG::DEMOS IG::Get_state()
+{
+    return curr_demo;
 }

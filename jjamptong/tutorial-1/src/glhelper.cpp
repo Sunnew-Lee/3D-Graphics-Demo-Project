@@ -24,13 +24,13 @@ GLint GLHelper::height;
 GLdouble GLHelper::fps;
 std::string GLHelper::title;
 GLFWwindow* GLHelper::ptr_window;
-GLHelper::RenderMode GLHelper::currRenderMode = NORMAL;
-GLHelper::CameraMode GLHelper::currCameraMode = IDLE;
-GLboolean GLHelper::animated = GL_TRUE;
-GLboolean GLHelper::justAnimated = GL_FALSE;
+GLHelper::RenderMode GLHelper::currRenderMode = RenderMode::NORMAL;
+GLHelper::CameraMode GLHelper::currCameraMode = CameraMode::IDLE;
 GLboolean GLHelper::mouseClicked = GL_FALSE;
 glm::vec2 GLHelper::mouse_pos = glm::vec2(0.0f, 0.0f);
 glm::vec2 GLHelper::world_mouse_pos = glm::vec2(0.0f, 0.0f);
+//GLboolean GLHelper::animated = GL_TRUE;
+//GLboolean GLHelper::justAnimated = GL_FALSE;
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -158,7 +158,7 @@ were held down
 This function is called when keyboard buttons are pressed.
 When the ESC key is pressed, the close flag of the window is set.
 */
-void GLHelper::key_cb(GLFWwindow *pwin, int key, int scancode, int action, int mod) {
+void GLHelper::key_cb(GLFWwindow *pwin, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]]int mod) {
   if (GLFW_PRESS == action) {
 #ifdef _DEBUG
     std::cout << "Key pressed" << std::endl;
@@ -177,56 +177,56 @@ void GLHelper::key_cb(GLFWwindow *pwin, int key, int scancode, int action, int m
     glfwSetWindowShouldClose(pwin, GLFW_TRUE);
   }
 
-  else if (GLFW_KEY_TAB == key && GLFW_PRESS == action ) {
-      switch (currRenderMode)
-      {
-      case WIREFRAME:
-          /*  Switch to drawing using color/texture */
-          currRenderMode = NORMAL; // COLOR
-          /*  Draw filled triangles and enable back-face culling */
-          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-          glEnable(GL_CULL_FACE);
-          break;
+  //else if (GLFW_KEY_TAB == key && GLFW_PRESS == action ) {
+  //    switch (currRenderMode)
+  //    {
+  //    case WIREFRAME:
+  //        /*  Switch to drawing using color/texture */
+  //        currRenderMode = NORMAL; // COLOR
+  //        /*  Draw filled triangles and enable back-face culling */
+  //        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  //        glEnable(GL_CULL_FACE);
+  //        break;
 
-      case COLOR:
-          /*  Switch to drawing using normals */
-          currRenderMode = NORMAL;
-          /*  Draw filled triangles and enable back-face culling */
-          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-          glEnable(GL_CULL_FACE);
-          break;
+  //    //case COLOR:
+  //    //    /*  Switch to drawing using normals */
+  //    //    currRenderMode = NORMAL;
+  //    //    /*  Draw filled triangles and enable back-face culling */
+  //    //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  //    //    glEnable(GL_CULL_FACE);
+  //    //    break;
 
-      case NORMAL:
-          /*  Switch to wireframe mode */
-          currRenderMode = WIREFRAME;
-          /*  Draw lines and disable back-face culling */
-          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-          glDisable(GL_CULL_FACE);
-          break;
-      }
-  }
-  else if (GLFW_KEY_SPACE == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-      animated = !animated;
-      if (animated)
-          justAnimated = GL_TRUE;
-  }
+  //    case NORMAL:
+  //        /*  Switch to wireframe mode */
+  //        currRenderMode = WIREFRAME;
+  //        /*  Draw lines and disable back-face culling */
+  //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  //        glDisable(GL_CULL_FACE);
+  //        break;
+  //    }
+  //}
+  //else if (GLFW_KEY_SPACE == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
+  //    animated = !animated;
+  //    if (animated)
+  //        justAnimated = GL_TRUE;
+  //}
   else if (GLFW_KEY_W == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = UP;
+	  currCameraMode = CameraMode::UP;
   }
   else if (GLFW_KEY_S == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = DOWN;
+	  currCameraMode = CameraMode::DOWN;
   }
   else if (GLFW_KEY_A == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = LEFT;
+	  currCameraMode = CameraMode::LEFT;
   }
   else if (GLFW_KEY_D == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = RIGHT;
+	  currCameraMode = CameraMode::RIGHT;
   }
   else if (GLFW_KEY_UP == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = CLOSER;
+	  currCameraMode = CameraMode::CLOSER;
   }
   else if (GLFW_KEY_DOWN == key && (GLFW_PRESS == action || GLFW_REPEAT == action)) {
-	  currCameraMode = FARTHER;
+	  currCameraMode = CameraMode::FARTHER;
   }
 }
 
@@ -252,7 +252,7 @@ were held down
 
 This function is called when mouse buttons are pressed.
 */
-void GLHelper::mousebutton_cb(GLFWwindow *pwin, int button, int action, int mod) {
+void GLHelper::mousebutton_cb([[maybe_unused]] GLFWwindow *pwin, int button, int action, [[maybe_unused]] int mod) {
   switch (button) {
   case GLFW_MOUSE_BUTTON_LEFT:
 #ifdef _DEBUG
@@ -305,7 +305,7 @@ new cursor y-coordinate, relative to the top edge of the client area
 This functions receives the cursor position, measured in screen coordinates but
 relative to the top-left corner of the window client area.
 */
-void GLHelper::mousepos_cb(GLFWwindow *pwin, double xpos, double ypos) {
+void GLHelper::mousepos_cb([[maybe_unused]] GLFWwindow *pwin, [[maybe_unused]] double xpos, [[maybe_unused]] double ypos) {
 #ifdef _DEBUG
   //std::cout << "Mouse cursor position: (" << xpos << ", " << ypos << ")" << std::endl;
 #endif
@@ -333,7 +333,7 @@ This function is called when the user scrolls, whether with a mouse wheel or
 touchpad gesture. Although the function receives 2D scroll offsets, a simple
 mouse scroll wheel, being vertical, provides offsets only along the Y-axis.
 */
-void GLHelper::mousescroll_cb(GLFWwindow *pwin, double xoffset, double yoffset) {
+void GLHelper::mousescroll_cb([[maybe_unused]] GLFWwindow *pwin, [[maybe_unused]] double xoffset, double yoffset) {
 #ifdef _DEBUG
   //std::cout << "Mouse scroll wheel offset: ("
     //<< xoffset << ", " << yoffset << ")" << std::endl;
@@ -342,10 +342,10 @@ void GLHelper::mousescroll_cb(GLFWwindow *pwin, double xoffset, double yoffset) 
   switch (static_cast<int>(yoffset))
   {
   case 1:
-      currCameraMode=FARTHER;
+      currCameraMode= CameraMode::FARTHER;
       break;
   case -1:
-      currCameraMode=CLOSER;
+      currCameraMode= CameraMode::CLOSER;
       break;
   }
 }
@@ -364,7 +364,7 @@ Human-readable description of the code
 The error callback receives a human-readable description of the error and
 (when possible) its cause.
 */
-void GLHelper::error_cb(int error, char const* description) {
+void GLHelper::error_cb([[maybe_unused]] int error, char const* description) {
   std::cerr << "GLFW error: " << description << std::endl;
 }
 
@@ -385,10 +385,10 @@ Height in pixels of new window size
 This function is called when the window is resized - it receives the new size
 of the window in pixels.
 */
-void GLHelper::fbsize_cb(GLFWwindow *ptr_win, int width, int height) {
+void GLHelper::fbsize_cb([[maybe_unused]] GLFWwindow *ptr_win, int w, int h) {
   std::cout << "fbsize_cb getting called!!!" << std::endl;
   // use the entire framebuffer as drawing region
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, w, h);
   // later, if working in 3D, we'll have to set the projection matrix here ...
 }
 

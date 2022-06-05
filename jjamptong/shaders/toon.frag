@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-uniform vec3 u_light = vec3(5.0, 10.0, 0.0);
+uniform vec3 u_light;
 uniform vec3 fogColor = vec3(0.5, 0.5, 0.5);
 uniform vec3 u_lightColor = vec3(1.0, 1.0, 1.0);
 uniform float u_ambient = 0.5;
@@ -35,7 +35,16 @@ void main(void)
 
     vec3 diffuse = nl * u_lightColor;
 
-    vec3 temp_color=(u_ambient+diffuse)*color.xyz;
+    vec3 temp_color=(u_ambient+diffuse);
+
+     if (color.r < 0)
+    {
+            temp_color *= NRM.rgb;             /*  Use normal for color */
+    }
+    else
+        temp_color *= color.xyz;   /* Use obj's color as usual */
+
+    
 
     outColor=vec4(temp_color,1);
 

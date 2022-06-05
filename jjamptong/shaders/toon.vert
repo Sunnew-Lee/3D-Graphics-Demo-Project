@@ -12,8 +12,8 @@ out vec3 NRM;
 out float visibility;
 out vec3 frag_pos;
 
-const float density=0.05;
-const float gradient = 1.5;
+const float density=0.5;
+const float gradient = 0.5;
 void main()
 {
     gl_Position = mvpMat * vec4(pos, 1.0);
