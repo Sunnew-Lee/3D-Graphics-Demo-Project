@@ -198,6 +198,9 @@ void SetUp()
     /*  Starting time */
     /*  Compile and link the shaders into rendering program */
     CompileShaders();
+    /*  Hidden surface removal */
+    glEnable(GL_DEPTH_TEST);
+
     shdr_pgm.Use();
 
     /*  Obtain the locations of the variables in the shaders with the given names */
@@ -219,8 +222,6 @@ void SetUp()
     /*  Initially drawing using filled mode */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
-    /*  Hidden surface removal */
-    glEnable(GL_DEPTH_TEST);
 
     Lightview = glm::lookAt(lightPos, { 0.,0.,0. }, { 0.,1.,0. });
     Lightproj = Frustum(leftPlane, rightPlane, bottomPlane, topPlane, nearPlane, farPlane);
@@ -364,9 +365,9 @@ void Render()
     case GLHelper::FARTHER:MoveFarther(); GLHelper::currCameraMode = GLHelper::IDLE; break;
     }
 
-    float metalRough = 0.43f;
+    const float metalRough = 0.43f;
 
-    ComputeViewProjMats();
+   
     //UpdateUniforms_Draw(base, Lightproj * Lightview * base.selfMat, Lightview* base.selfMat);
     //  DrawMetal(metalRough, 1);
     //for (int i = 0; i < NUM_MESHES-1; ++i)
@@ -385,7 +386,6 @@ void Render()
    // UpdateUniforms_Draw(wall, wallMVPMat);
     UpdateUniforms_Draw(base, baseMVPMat, baseMVMat);
 
-    DrawMetal(metalRough, 1);
 
     for (int i = 0; i < NUM_MESHES-1; ++i)
     {
@@ -393,6 +393,7 @@ void Render()
             UpdateTransform(i);
 
         /*  Send each part's data to shaders for rendering */
+		DrawMetal(metalRough, 1, glm::vec3(1, 0.71f, 0.29f));
         UpdateUniforms_Draw(part[i], partMVPMat[i], partMVMat[i]);
         
     }
@@ -410,5 +411,5 @@ void DrawMetal( float rough, int metal,  glm::vec3 color)
     shdr_pgm.SetUniform("Material.Rough", rough);
     shdr_pgm.SetUniform("Material.Metal", metal);
     shdr_pgm.SetUniform("Material.Color", color);
-    
+    ComputeViewProjMats();
 }
